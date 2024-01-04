@@ -35,7 +35,6 @@ class RunnableRequest implements Runnable {
 public class KeyValueServiceMultithreadingTest {
 
     private KeyValueService keyValueService;
-    private final int numThreads = 10000;
 
     @BeforeEach
     void setUp() {
@@ -44,10 +43,20 @@ public class KeyValueServiceMultithreadingTest {
 
     @Test
     void testKeyValueMultithreading() {
+        final int numThreads = 10000;
+        Thread[] threads = new Thread[numThreads];
+
         for (int i = 0; i < numThreads; i++) {
             RunnableRequest runnableRequest = new RunnableRequest(keyValueService, "set", "testKey" + i, "testValue" + i);
-            Thread thread = new Thread(runnableRequest);
-            thread.start();
+            threads[i] = new Thread(runnableRequest);
+            threads[i].start();
+        }
+        for (int i = 0; i < numThreads; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                System.out.println("Thread interrupted");
+            }
         }
         for (int i = 0; i < numThreads; i++) {
             String value = keyValueService.getKeyValue("testKey" + i);
@@ -55,8 +64,15 @@ public class KeyValueServiceMultithreadingTest {
         }
         for (int i = 0; i < numThreads; i++) {
             RunnableRequest runnableRequest = new RunnableRequest(keyValueService, "delete", "testKey" + i, "testValue" + i);
-            Thread thread = new Thread(runnableRequest);
-            thread.start();
+            threads[i] = new Thread(runnableRequest);
+            threads[i].start();
+        }
+        for (int i = 0; i < numThreads; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                System.out.println("Thread interrupted");
+            }
         }
         for (int i = 0; i < numThreads; i++) {
             String value = keyValueService.getKeyValue("testKey" + i);
