@@ -3,6 +3,8 @@ package com.keyvalueserver.project.service;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
+import java.util.List;
+import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 
 @Service
@@ -10,11 +12,16 @@ public class KeyValueService {
 
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
 
-    public String setKeyValue(String key, String value) throws IllegalArgumentException {
-        if (key == null || value == null) {
-            throw new IllegalArgumentException("Key or value cannot be null");
+    public String setKeyValue(List<KeyValuePair> data) throws IllegalArgumentException {
+
+        for (KeyValuePair keyValuePair : data) {
+            String key = keyValuePair.getKey();
+            String value = keyValuePair.getValue();
+            if (key == null || value == null) {
+                throw new IllegalArgumentException("Key or value cannot be null");
+            }
+            keyValueStore.put(key, value);
         }
-        keyValueStore.put(key, value);
         return "Key value pair added";
     }
 

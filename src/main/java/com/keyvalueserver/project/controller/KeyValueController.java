@@ -12,13 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import com.google.gson.Gson;
+import java.util.List;
 
 import com.keyvalueserver.project.model.KeyValuePOJO;
+import com.keyvalueserver.project.model.KeyValuePair;
 
 @RestController
 @Slf4j
 public class KeyValueController {
-
     private final KeyValueService keyValueService;
     @Autowired
     public KeyValueController(KeyValueService keyValueService) {
@@ -48,9 +49,8 @@ public class KeyValueController {
         Gson gson = new Gson();
         try (BufferedReader reader = request.getReader()) {
             KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
-            String key = keyValuePOJO.getKey();
-            String value = keyValuePOJO.getValue();
-            String response = keyValueService.setKeyValue(key, value);
+            List<KeyValuePair> data = keyValuePOJO.getData();
+            String response = keyValueService.setKeyValue(data);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, response, null));
         } catch (IOException e) {
             log.error(String.format("%s. Error reading request body. Method: Post, Path: /keys", e));
