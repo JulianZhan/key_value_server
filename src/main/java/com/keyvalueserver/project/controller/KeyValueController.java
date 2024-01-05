@@ -2,15 +2,18 @@ package com.keyvalueserver.project.controller;
 
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 import com.keyvalueserver.project.service.KeyValueService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import java.lang.Exception;
-
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import com.google.gson.Gson;
+
+import com.keyvalueserver.project.model.KeyValuePOJO;
 
 @RestController
 @Slf4j
@@ -42,17 +45,21 @@ public class KeyValueController {
 
     @PostMapping("/keys")
     public ResponseEntity<ApiResponse> postKeyValue(HttpServletRequest request) {
-
-        String key = keyValuePOJO.getKey();
-        String value = keyValuePOJO.getValue();
-        try {
+        Gson gson = new Gson();
+        try (BufferedReader reader = request.getReader()) {
+            KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
+            String key = keyValuePOJO.getKey();
+            String value = keyValuePOJO.getValue();
             String response = keyValueService.setKeyValue(key, value);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(true, response, null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, response, null));
+        } catch (IOException e) {
+            log.error(String.format("%s. Error reading request body. Method: Post, Path: /keys", e));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(false, "Error reading request body", null));
         } catch (IllegalArgumentException e) {
-            log.error(String.format("Key or value may be null %s %s. Method: Post, Path: /keys", key, value));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, e.getMessage(), null));
+            log.error(String.format("%s. Key or value may be null. Method: Post, Path: /keys", e));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, "Key or value cannot be null", null));
         } catch (Exception e) {
-            log.error(String.format("Internal server error %s %s. Method: Post, Path: /keys", key, value));
+            log.error(String.format("%s. Internal server error. Method: Post, Path: /keys", e));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(false, "Internal server error", null));
         }
     }

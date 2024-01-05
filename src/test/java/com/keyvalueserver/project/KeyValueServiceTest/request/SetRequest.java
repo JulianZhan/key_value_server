@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.KeyValueServiceTest.Request;
+package com.keyvalueserver.project.KeyValueServiceTest.request;
 
 import com.keyvalueserver.project.service.KeyValueService;
 

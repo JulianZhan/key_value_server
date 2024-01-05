@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.keyvalueserver.project.service.KeyValueService;
-import com.keyvalueserver.project.KeyValueServiceTest.Request.SetRequest;
-import com.keyvalueserver.project.KeyValueServiceTest.Request.GetRequest;
-import com.keyvalueserver.project.KeyValueServiceTest.Request.DeleteRequest;
+import com.keyvalueserver.project.KeyValueServiceTest.request.SetRequest;
+import com.keyvalueserver.project.KeyValueServiceTest.request.GetRequest;
+import com.keyvalueserver.project.KeyValueServiceTest.request.DeleteRequest;
 
 
 public class KeyValueServiceMultithreadingTest {
