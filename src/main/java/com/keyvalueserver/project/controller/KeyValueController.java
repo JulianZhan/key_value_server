@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import com.google.gson.Gson;
+
+import java.util.Arrays;
 import java.util.List;
 
 import com.keyvalueserver.project.model.KeyValuePOJO;
@@ -27,21 +29,20 @@ public class KeyValueController {
     }
 
     @GetMapping("/keys/{key}")
-    public ResponseEntity<ApiResponse> getKeyValue(@PathVariable("key") String key) {
+    public ResponseEntity<ApiResponse> getKeyValue(@PathVariable("key") String[] keys) {
         try {
-            String value = keyValueService.getKeyValue(key);
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key retrieved successfully", value));
+            String[] value = keyValueService.getKeyValue(keys);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key retrieved successfully", Arrays.toString(keys)));
         } catch (KeyNotFoundException e) {
-            log.error(String.format("Key %s not found. Method: Get, Path: /keys/{%s}", key, key));
+            log.error(String.format("Key %s not found. Method: Get, Path: /keys/{%s}", Arrays.toString(keys), Arrays.toString(keys)));
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, e.getMessage(), null));
         } catch (IllegalArgumentException e) {
-            log.error(String.format("Key may be null %s. Method: Get, Path: /keys/{%s}", key, key));
+            log.error(String.format("Key may be null %s. Method: Get, Path: /keys/{%s}", Arrays.toString(keys), Arrays.toString(keys)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, e.getMessage(), null));
         } catch (Exception e) {
-            log.error(String.format("Internal server error %s. Method: Get, Path: /keys/{%s}", key, key));
+            log.error(String.format("Internal server error %s. Method: Get, Path: /keys/{%s}", Arrays.toString(keys), Arrays.toString(keys)));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(false, "Internal server error", null));
         }
-
     }
 
     @PostMapping("/keys")
@@ -65,15 +66,15 @@ public class KeyValueController {
     }
 
     @DeleteMapping("/keys/{key}")
-    public ResponseEntity<ApiResponse> deleteKeyValue(@PathVariable("key") String key) {
+    public ResponseEntity<ApiResponse> deleteKeyValue(@PathVariable("key") String[] keys) {
         try {
-            String response = keyValueService.deleteKeyValue(key);
+            String response = keyValueService.deleteKeyValue(keys);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, response, null));
         } catch (IllegalArgumentException e) {
-            log.error(String.format("Key may be null %s. Method: Delete, Path: /keys/{%s}", key, key));
+            log.error(String.format("Key may be null %s. Method: Delete, Path: /keys/{%s}", Arrays.toString(keys), Arrays.toString(keys)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, e.getMessage(), null));
         } catch (Exception e) {
-            log.error(String.format("Internal server error %s. Method: Delete, Path: /keys/{%s}", key, key));
+            log.error(String.format("Internal server error %s. Method: Delete, Path: /keys/{%s}", Arrays.toString(keys), Arrays.toString(keys)));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(false, "Internal server error", null));
         }
     }
