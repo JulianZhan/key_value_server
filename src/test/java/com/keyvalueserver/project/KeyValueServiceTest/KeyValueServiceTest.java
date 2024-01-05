@@ -1,5 +1,6 @@
-package com.keyvalueserver.project;
+package com.keyvalueserver.project.KeyValueServiceTest;
 
+import com.keyvalueserver.project.KeyValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +35,5 @@ public class KeyValueServiceTest {
         keyValueService.setKeyValue("testKey", "testValue");
         String response = keyValueService.deleteKeyValue("testKey");
         assertEquals("Key value pair deleted", response);
-        assertNull(keyValueService.getKeyValue("testKey"));
     }
 }

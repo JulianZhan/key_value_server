@@ -1,59 +1,14 @@
-package com.keyvalueserver.project;
+package com.keyvalueserver.project.KeyValueServiceTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class SetRequest implements Runnable {
-    private KeyValueService keyValueService;
-    private String key;
-    private String value;
-
-    protected SetRequest(KeyValueService keyValueService, String key, String value) {
-        this.keyValueService = keyValueService;
-        this.key = key;
-        this.value = value;
-    }
-
-    public void run() {
-        keyValueService.setKeyValue(key, value);
-    }
-}
-
-class GetRequest implements Runnable {
-    private KeyValueService keyValueService;
-    private String key;
-    private String value;
-
-    protected GetRequest(KeyValueService keyValueService, String key) {
-        this.keyValueService = keyValueService;
-        this.key = key;
-    }
-
-    public void run() {
-        value = keyValueService.getKeyValue(key);
-    }
-
-    public String getValue() {
-        return value;
-    }
-}
-
-class DeleteRequest implements Runnable {
-    private KeyValueService keyValueService;
-    private String key;
-
-    protected DeleteRequest(KeyValueService keyValueService, String key) {
-        this.keyValueService = keyValueService;
-        this.key = key;
-    }
-
-    public void run() {
-        keyValueService.deleteKeyValue(key);
-    }
-}
-
+import com.keyvalueserver.project.KeyValueService;
+import com.keyvalueserver.project.KeyValueServiceTest.Request.SetRequest;
+import com.keyvalueserver.project.KeyValueServiceTest.Request.GetRequest;
+import com.keyvalueserver.project.KeyValueServiceTest.Request.DeleteRequest;
 
 
 public class KeyValueServiceMultithreadingTest {
@@ -124,4 +79,3 @@ public class KeyValueServiceMultithreadingTest {
     }
 
 }
-
