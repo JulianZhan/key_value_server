@@ -1,6 +1,6 @@
 package com.keyvalueserver.project.KeyValueServiceTest.Request;
 
-import com.keyvalueserver.project.KeyValueService;
+import com.keyvalueserver.project.service.KeyValueService;
 
 public class SetRequest implements Runnable {
     private final KeyValueService keyValueService;

@@ -1,10 +1,9 @@
-package com.keyvalueserver.project;
+package com.keyvalueserver.project.service;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
-import com.keyvalueserver.project.Exceptions.KeyNotFoundException;
+import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 
 @Service
 public class KeyValueService {

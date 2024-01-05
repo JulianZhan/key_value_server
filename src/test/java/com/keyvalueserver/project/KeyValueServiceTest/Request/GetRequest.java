@@ -1,6 +1,6 @@
 package com.keyvalueserver.project.KeyValueServiceTest.Request;
 
-import com.keyvalueserver.project.KeyValueService;
+import com.keyvalueserver.project.service.KeyValueService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class GetRequest implements Runnable {

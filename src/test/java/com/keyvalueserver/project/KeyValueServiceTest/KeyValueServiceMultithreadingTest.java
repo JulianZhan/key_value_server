@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.keyvalueserver.project.KeyValueService;
+import com.keyvalueserver.project.service.KeyValueService;
 import com.keyvalueserver.project.KeyValueServiceTest.Request.SetRequest;
 import com.keyvalueserver.project.KeyValueServiceTest.Request.GetRequest;
 import com.keyvalueserver.project.KeyValueServiceTest.Request.DeleteRequest;
