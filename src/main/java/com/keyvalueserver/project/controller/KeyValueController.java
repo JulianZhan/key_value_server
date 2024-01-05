@@ -51,8 +51,7 @@ public class KeyValueController {
         try (BufferedReader reader = request.getReader()) {
             KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
             List<KeyValuePair> data = keyValuePOJO.getData();
-            String response = keyValueService.setKeyValue(data);
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, response, null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key added successfully", data.toString()));
         } catch (IOException e) {
             log.error(String.format("%s. Error reading request body. Method: Post, Path: /keys", e));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(false, "Error reading request body", null));
@@ -68,8 +67,7 @@ public class KeyValueController {
     @DeleteMapping("/keys/{key}")
     public ResponseEntity<ApiResponse> deleteKeyValue(@PathVariable("key") String[] keys) {
         try {
-            String response = keyValueService.deleteKeyValue(keys);
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, response, null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key deleted successfully", Arrays.toString(keys)));
         } catch (IllegalArgumentException e) {
             log.error(String.format("Key may be null %s. Method: Delete, Path: /keys/{%s}", Arrays.toString(keys), Arrays.toString(keys)));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, e.getMessage(), null));

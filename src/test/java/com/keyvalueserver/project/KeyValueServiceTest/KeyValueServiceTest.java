@@ -5,6 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import java.util.Arrays;
+import java.util.List;
+import com.keyvalueserver.project.model.KeyValuePair;
+import com.keyvalueserver.project.exceptions.KeyNotFoundException;
+
+
 
 public class KeyValueServiceTest {
 
@@ -16,49 +23,73 @@ public class KeyValueServiceTest {
     }
 
     @Test
-    void setKeyValueWithValidInputs() {
-        KeyValueService keyValueService = new KeyValueService();
-        String result = keyValueService.setKeyValue("key", "value");
-        assertEquals("Key value pair added", result);
+    void testSetAndGetKeyValue() {
+        List<KeyValuePair> keyValuePairs = Arrays.asList(
+                new KeyValuePair("key1", "value1"),
+                new KeyValuePair("key2", "value2")
+        );
+        keyValueService.setKeyValue(keyValuePairs);
+
+        String[] keys = {"key1", "key2"};
+        String[] values = keyValueService.getKeyValue(keys);
+
+        assertArrayEquals(new String[]{"value1", "value2"}, values);
     }
 
     @Test
-    void getKeyValueWithValidKey() {
-        KeyValueService keyValueService = new KeyValueService();
-        keyValueService.setKeyValue("key", "value");
-        String result = keyValueService.getKeyValue("key");
-        assertEquals("value", result);
+    void testKeyNotFound() {
+        String[] keys = {"nonExistingKey"};
+        KeyNotFoundException exception = assertThrows(
+                KeyNotFoundException.class,
+                () -> keyValueService.getKeyValue(keys)
+        );
+
+        assertEquals("Key nonExistingKey not found", exception.getMessage());
     }
 
     @Test
-    void deleteKeyValueWithValidKey() {
-        KeyValueService keyValueService = new KeyValueService();
-        keyValueService.setKeyValue("key", "value");
-        String result = keyValueService.deleteKeyValue("key");
-        assertEquals("Key value pair deleted", result);
+    void testNullKeyInSet() {
+        List<KeyValuePair> keyValuePairs = Arrays.asList(
+                new KeyValuePair(null, "value1")
+        );
+
+        assertThrows(IllegalArgumentException.class, () -> keyValueService.setKeyValue(keyValuePairs));
     }
 
     @Test
-    void setKeyValueWithNullKey() {
-        KeyValueService keyValueService = new KeyValueService();
-        assertThrows(IllegalArgumentException.class, () -> {
-            keyValueService.setKeyValue(null, "value");
-        });
+    void testNullValueInSet() {
+        List<KeyValuePair> keyValuePairs = Arrays.asList(
+                new KeyValuePair("key1", null)
+        );
+
+        assertThrows(IllegalArgumentException.class, () -> keyValueService.setKeyValue(keyValuePairs));
     }
 
     @Test
-    void setKeyValueWithNullValue() {
-        KeyValueService keyValueService = new KeyValueService();
-        assertThrows(IllegalArgumentException.class, () -> {
-            keyValueService.setKeyValue("key", null);
-        });
+    void testNullKeyInGet() {
+        String[] keys = {null};
+        assertThrows(IllegalArgumentException.class, () -> keyValueService.getKeyValue(keys));
     }
 
     @Test
-    void getKeyValueWithNullKey() {
-        KeyValueService keyValueService = new KeyValueService();
-        assertThrows(IllegalArgumentException.class, () -> {
-            keyValueService.getKeyValue(null);
-        });
+    void testDeleteKeyValue() {
+        // Setting a key-value pair
+        List<KeyValuePair> keyValuePairs = Arrays.asList(new KeyValuePair("key1", "value1"));
+        keyValueService.setKeyValue(keyValuePairs);
+
+        // Deleting the key-value pair
+        String[] keysToDelete = {"key1"};
+        keyValueService.deleteKeyValue(keysToDelete);
+
+        // Trying to retrieve deleted key
+        String[] keys = {"key1"};
+        assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys));
     }
+
+    @Test
+    void testNullKeyInDelete() {
+        String[] keys = {null};
+        assertThrows(IllegalArgumentException.class, () -> keyValueService.deleteKeyValue(keys));
+    }
+
 }

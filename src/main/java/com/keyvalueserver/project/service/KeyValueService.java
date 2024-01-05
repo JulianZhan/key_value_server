@@ -12,7 +12,7 @@ public class KeyValueService {
 
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
 
-    public String setKeyValue(List<KeyValuePair> data) throws IllegalArgumentException {
+    public void setKeyValue(List<KeyValuePair> data) throws IllegalArgumentException {
 
         for (KeyValuePair keyValuePair : data) {
             String key = keyValuePair.getKey();
@@ -22,7 +22,6 @@ public class KeyValueService {
             }
             keyValueStore.put(key, value);
         }
-        return "Key value pair added";
     }
 
     public String[] getKeyValue(String[] keys) throws KeyNotFoundException, IllegalArgumentException {
@@ -40,13 +39,12 @@ public class KeyValueService {
         return values;
     }
 
-    public String deleteKeyValue(String[] keys) throws IllegalArgumentException {
+    public void deleteKeyValue(String[] keys) throws IllegalArgumentException {
         for (String key : keys) {
             if (key == null) {
                 throw new IllegalArgumentException("Key cannot be null");
             }
             keyValueStore.remove(key);
         }
-        return "Key value pair deleted";
     }
 }
