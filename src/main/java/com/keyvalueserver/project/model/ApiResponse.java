@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.controller;
+package com.keyvalueserver.project.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,5 +8,5 @@ import lombok.Getter;
 public class ApiResponse {
     private final boolean success;
     private final String message;
-    private final String data;
+    private final String[] data;
 }

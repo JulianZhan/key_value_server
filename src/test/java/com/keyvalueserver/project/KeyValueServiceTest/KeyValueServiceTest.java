@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
@@ -24,10 +24,9 @@ public class KeyValueServiceTest {
 
     @Test
     void testSetAndGetKeyValue() {
-        List<KeyValuePair> keyValuePairs = Arrays.asList(
-                new KeyValuePair("key1", "value1"),
-                new KeyValuePair("key2", "value2")
-        );
+        List<KeyValuePair> keyValuePairs = new ArrayList<>();
+        keyValuePairs.add(new KeyValuePair("key1", "value1"));
+        keyValuePairs.add(new KeyValuePair("key2", "value2"));
         keyValueService.setKeyValue(keyValuePairs);
 
         String[] keys = {"key1", "key2"};
@@ -49,18 +48,15 @@ public class KeyValueServiceTest {
 
     @Test
     void testNullKeyInSet() {
-        List<KeyValuePair> keyValuePairs = Arrays.asList(
-                new KeyValuePair(null, "value1")
-        );
-
+        List<KeyValuePair> keyValuePairs = new ArrayList<>();
+        keyValuePairs.add(new KeyValuePair(null, "value1"));
         assertThrows(IllegalArgumentException.class, () -> keyValueService.setKeyValue(keyValuePairs));
     }
 
     @Test
     void testNullValueInSet() {
-        List<KeyValuePair> keyValuePairs = Arrays.asList(
-                new KeyValuePair("key1", null)
-        );
+        List<KeyValuePair> keyValuePairs = new ArrayList<>();
+        keyValuePairs.add(new KeyValuePair("key1", null));
 
         assertThrows(IllegalArgumentException.class, () -> keyValueService.setKeyValue(keyValuePairs));
     }
@@ -74,7 +70,8 @@ public class KeyValueServiceTest {
     @Test
     void testDeleteKeyValue() {
         // Setting a key-value pair
-        List<KeyValuePair> keyValuePairs = Arrays.asList(new KeyValuePair("key1", "value1"));
+        List<KeyValuePair> keyValuePairs = new ArrayList<>();
+        keyValuePairs.add(new KeyValuePair("key1", "value1"));
         keyValueService.setKeyValue(keyValuePairs);
 
         // Deleting the key-value pair
