@@ -56,9 +56,16 @@ public class KeyValueController {
     }
 
     @GetMapping("/download")
-    public void downloadKeyValuePairsAsCSV(HttpServletResponse servletResponse) throws IOException {
-        servletResponse.setContentType("text/csv");
-        servletResponse.addHeader("Content-Disposition","attachment; filename=\"key_value_pairs.csv\"");
-        keyValueService.exportCSVFile(servletResponse.getWriter());
+    public void downloadKeyValuePairsAsCSV(HttpServletResponse servletResponse) {
+        try {
+            servletResponse.setContentType("text/csv; charset=UTF-8");
+            servletResponse.setCharacterEncoding("UTF-8");
+            servletResponse.addHeader("Content-Disposition","attachment; filename=\"key_value_pairs.csv\"");
+            keyValueService.exportCSVFile(servletResponse.getWriter());
+        } catch (IOException e) {
+            log.error("Error writing to CSV file. Method: Get, Path: /keys/download");
+            servletResponse.setContentType("application/json");
+            servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 }
