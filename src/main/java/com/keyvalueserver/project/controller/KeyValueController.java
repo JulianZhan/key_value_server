@@ -35,18 +35,15 @@ public class KeyValueController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> postKeyValue(HttpServletRequest request) {
+    public ResponseEntity<ApiResponse> postKeyValue(HttpServletRequest request) throws IOException {
         Gson gson = new Gson();
         // try with resources, automatically closes reader
-        try (BufferedReader reader = request.getReader()) {
-            KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
-            List<KeyValuePair> data = keyValuePOJO.getData();
-            keyValueService.setKeyValue(data);
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key added successfully", null));
-        } catch (IOException e) {
-            log.error(String.format("Error reading request body %s. Method: Post, Path: /keys", e.getMessage()));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, "Error reading request body", null));
-        }
+        BufferedReader reader = request.getReader();
+        KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
+        List<KeyValuePair> data = keyValuePOJO.getData();
+        keyValueService.setKeyValue(data);
+        reader.close();
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key added successfully", null));
     }
 
     @DeleteMapping("/{key}")
@@ -56,16 +53,10 @@ public class KeyValueController {
     }
 
     @GetMapping("/download")
-    public void downloadKeyValuePairsAsCSV(HttpServletResponse servletResponse) {
-        try {
-            servletResponse.setContentType("text/csv; charset=UTF-8");
-            servletResponse.setCharacterEncoding("UTF-8");
-            servletResponse.addHeader("Content-Disposition","attachment; filename=\"key_value_pairs.csv\"");
-            keyValueService.exportCSVFile(servletResponse.getWriter());
-        } catch (IOException e) {
-            log.error("Error writing to CSV file. Method: Get, Path: /keys/download");
-            servletResponse.setContentType("application/json");
-            servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
+    public void downloadKeyValuePairsAsCSV(HttpServletResponse servletResponse) throws IOException {
+        servletResponse.setContentType("text/csv; charset=UTF-8");
+        servletResponse.setCharacterEncoding("UTF-8");
+        servletResponse.addHeader("Content-Disposition","attachment; filename=\"key_value_pairs.csv\"");
+        keyValueService.exportCSVFile(servletResponse.getWriter());
     }
 }

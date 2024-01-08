@@ -1,5 +1,6 @@
 package com.keyvalueserver.project.service;
 
+import java.io.PrintWriter;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
@@ -8,7 +9,7 @@ import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-import java.io.Writer;
+
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVFormat;
 import lombok.extern.slf4j.Slf4j;
@@ -56,15 +57,11 @@ public class KeyValueService {
         }
     }
 
-    public void exportCSVFile(Writer writer) throws IOException {
-        try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
-            csvPrinter.printRecord("Key", "Value");
-            for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
-                csvPrinter.printRecord(entry.getKey(), entry.getValue());
-            }
-        } catch (IOException e) {
-            log.error("Error writing to CSV file");
-            throw e;
+    public void exportCSVFile(PrintWriter writer) throws IOException {
+        CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+        csvPrinter.printRecord("Key", "Value");
+        for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
+            csvPrinter.printRecord(entry.getKey(), entry.getValue());
         }
     }
 }
