@@ -4,14 +4,12 @@ import com.keyvalueserver.project.service.KeyValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.ArrayList;
-import java.util.List;
 import com.keyvalueserver.project.model.KeyValuePair;
 import java.io.IOException;
 import java.util.Arrays;
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 
@@ -27,26 +25,37 @@ public class KeyValueServiceCSVTest {
     }
 
     @Test
-    void testExportCSVFile() throws IOException {
-        // Create an instance of KeyValueService
-        KeyValueService keyValueService = new KeyValueService();
-
-        // Add some test data
-        keyValueService.setKeyValue(Arrays.asList(
-                new KeyValuePair("key1", "value1"),
-                new KeyValuePair("key2", "嗨嗨"),
-                new KeyValuePair("key3", "哈哈")
-        ));
-
-        // Create a StringWriter to capture the output
+    public void testWriteCSVHeader() {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        // Call the method under test
-        keyValueService.exportCSVFile(printWriter);
+        try {
+            keyValueService.exportCSVFile(printWriter);
+        } catch (IOException e) {
+            fail("IOException should not be thrown");
+        }
 
-        // Verify the output
-        String expectedOutput = "Key,Value\r\nkey1,value1\r\nkey2,嗨嗨\r\nkey3,哈哈\r\n";
+        String expectedOutput = "Key,Value\r\n";
+        assertEquals(expectedOutput, stringWriter.toString());
+    }
+
+    @Test
+    public void testWriteKeyValuePairs() {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        keyValueService.setKeyValue(Arrays.asList(
+                new KeyValuePair("key1", "嗨嗨"),
+                new KeyValuePair("測測", "value2")
+        ));
+
+        try {
+            keyValueService.exportCSVFile(printWriter);
+        } catch (IOException e) {
+            fail("IOException should not be thrown");
+        }
+
+        String expectedOutput = "Key,Value\r\nkey1,嗨嗨\r\n測測,value2\r\n";
         assertEquals(expectedOutput, stringWriter.toString());
     }
 }

@@ -38,12 +38,12 @@ public class KeyValueController {
     public ResponseEntity<ApiResponse> postKeyValue(HttpServletRequest request) throws IOException {
         Gson gson = new Gson();
         // try with resources, automatically closes reader
-        BufferedReader reader = request.getReader();
-        KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
-        List<KeyValuePair> data = keyValuePOJO.getData();
-        keyValueService.setKeyValue(data);
-        reader.close();
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key added successfully", null));
+        try (BufferedReader reader = request.getReader()) {
+            KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
+            List<KeyValuePair> data = keyValuePOJO.getData();
+            keyValueService.setKeyValue(data);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key added successfully", null));
+        }
     }
 
     @DeleteMapping("/{key}")
