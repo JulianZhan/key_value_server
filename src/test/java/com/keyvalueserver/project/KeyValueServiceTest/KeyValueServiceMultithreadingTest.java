@@ -27,10 +27,15 @@ class KeyValueServiceMultithreadingTest {
 
     @Test
     void testConcurrentAccess() throws InterruptedException {
+        // create a thread pool with numThreads threads
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         for (int i = 0; i < numIterations; i++) {
+            // create a KeyValuePOJO with a single KeyValuePair
             KeyValuePOJO keyValuePOJO = new KeyValuePOJO(List.of(new KeyValuePair("key" + i, "value" + i)));
+            /*submit a runnable task to the executor to set the key-value pair,
+             *which will be executed by one of the threads in the thread pool
+             */
             executor.submit(() -> {
                 keyValueService.setKeyValue(keyValuePOJO.getData());
             });
@@ -56,11 +61,13 @@ class KeyValueServiceMultithreadingTest {
             });
         }
 
+        // shutdown the executor and check if all tasks have completed on time
         executor.shutdown();
         assertTrue(executor.awaitTermination(1, TimeUnit.MINUTES));
 
         for (int i = 0; i < numIterations; i++) {
             String[] keys = {"key" + i};
+            // after deleting the key-value pair, all the keys should not be found
             assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys));
         }
     }

@@ -22,10 +22,11 @@ public class KeyValueService {
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
 
     public void setKeyValue(List<KeyValuePair> data) throws IllegalArgumentException {
-
+        // use for each loop to iterate through data list and put key-value pairs into keyValueStore
         for (KeyValuePair keyValuePair : data) {
             String key = keyValuePair.getKey();
             String value = keyValuePair.getValue();
+            // if key or value is null, throw exception, which will be handled by GlobalExceptionHandler later
             if (key == null || value == null) {
                 throw new IllegalArgumentException("Key or value cannot be null");
             }
@@ -35,7 +36,9 @@ public class KeyValueService {
 
     public String[] getKeyValue(String[] keys) throws KeyNotFoundException, IllegalArgumentException {
         String[] values = new String[keys.length];
+        // use for loop to iterate through keys array and get values from keyValueStore
         for (int i = 0; i < keys.length; i++) {
+            // if key or value is null, throw exception, which will be handled by GlobalExceptionHandler later
             if (keys[i] == null) {
                 throw new IllegalArgumentException("Key cannot be null");
             }
@@ -58,8 +61,12 @@ public class KeyValueService {
     }
 
     public void exportCSVFile(PrintWriter writer) throws IOException {
+        // Reference: https://springhow.com/spring-boot-export-to-csv/
+        // receive PrintWriter from HttpServletResponse in KeyValueController
         CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+        // print header
         csvPrinter.printRecord("Key", "Value");
+        // use for loop to print each key-value pair
         for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
             csvPrinter.printRecord(entry.getKey(), entry.getValue());
         }

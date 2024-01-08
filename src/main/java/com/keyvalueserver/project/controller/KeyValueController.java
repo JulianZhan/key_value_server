@@ -37,9 +37,11 @@ public class KeyValueController {
     @PostMapping
     public ResponseEntity<ApiResponse> postKeyValue(HttpServletRequest request) throws IOException {
         Gson gson = new Gson();
-        // try with resources, automatically closes reader
+        // use try with resources, automatically closes reader
         try (BufferedReader reader = request.getReader()) {
+            // convert JSON to predefined POJO
             KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
+            // use getter to access data
             List<KeyValuePair> data = keyValuePOJO.getData();
             keyValueService.setKeyValue(data);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(true, "Key added successfully", null));
@@ -54,9 +56,12 @@ public class KeyValueController {
 
     @GetMapping("/download")
     public void downloadKeyValuePairsAsCSV(HttpServletResponse servletResponse) throws IOException {
+        // UTF-8 encoding is required for non-English characters
         servletResponse.setContentType("text/csv; charset=UTF-8");
         servletResponse.setCharacterEncoding("UTF-8");
+        // Content-Disposition header is used to specify the name of the file
         servletResponse.addHeader("Content-Disposition","attachment; filename=\"key_value_pairs.csv\"");
+        // send printWriter to service layer to write CSV file, which will be sent to client
         keyValueService.exportCSVFile(servletResponse.getWriter());
     }
 }
