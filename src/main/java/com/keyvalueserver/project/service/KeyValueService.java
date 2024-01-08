@@ -6,13 +6,15 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
-import java.io.File;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
+import java.io.Writer;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVFormat;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 @Service
 public class KeyValueService {
 
@@ -54,14 +56,15 @@ public class KeyValueService {
         }
     }
 
-    public File createCSVFile() throws IOException {
-        File csvFile = File.createTempFile("key-value-pairs", ".csv");
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+    public void exportCSVFile(Writer writer) throws IOException {
+        try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
+            csvPrinter.printRecord("Key", "Value");
             for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
-                writer.write(entry.getKey() + "," + entry.getValue());
-                writer.newLine();
+                csvPrinter.printRecord(entry.getKey(), entry.getValue());
             }
+        } catch (IOException e) {
+            log.error("Error writing to CSV file");
+            throw e;
         }
-        return csvFile;
     }
 }

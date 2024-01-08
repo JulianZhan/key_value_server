@@ -12,14 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import com.google.gson.Gson;
 import java.util.List;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.FileSystemResource;
-import java.io.File;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.MediaType;
-
-
+import javax.servlet.http.HttpServletResponse;
 
 import com.keyvalueserver.project.model.KeyValuePOJO;
 import com.keyvalueserver.project.model.KeyValuePair;
@@ -63,22 +56,9 @@ public class KeyValueController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<Resource> downloadKeyValuePairsAsCSV() {
-        try {
-            File csvFile = keyValueService.createCSVFile();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition.attachment().filename(csvFile.getName()).build());
-            headers.setContentType(MediaType.TEXT_PLAIN);
-
-            Resource fileSystemResource = new FileSystemResource(csvFile);
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(fileSystemResource);
-        } catch (IOException e) {
-            log.error("Error creating CSV file", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
+    public void downloadKeyValuePairsAsCSV(HttpServletResponse servletResponse) throws IOException {
+        servletResponse.setContentType("text/csv");
+        servletResponse.addHeader("Content-Disposition","attachment; filename=\"key_value_pairs.csv\"");
+        keyValueService.exportCSVFile(servletResponse.getWriter());
     }
 }
