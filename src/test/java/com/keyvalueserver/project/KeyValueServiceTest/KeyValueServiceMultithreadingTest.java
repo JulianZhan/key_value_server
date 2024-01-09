@@ -33,7 +33,8 @@ class KeyValueServiceMultithreadingTest {
         for (int i = 0; i < numIterations; i++) {
             // create a KeyValuePOJO with a single KeyValuePair
             KeyValuePOJO keyValuePOJO = new KeyValuePOJO(List.of(new KeyValuePair("key" + i, "value" + i)));
-            /*submit a runnable task to the executor to set the key-value pair,
+            /*
+             *submit a runnable task to the executor to set the key-value pair,
              *which will be executed by one of the threads in the thread pool
              */
             executor.submit(() -> {
