@@ -46,9 +46,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 // don't require authentication for this endpoint
-                .authorizeRequests().antMatchers("/auth/login").permitAll().
+                .authorizeRequests().antMatchers("/auth/login")
+                .permitAll().
+                antMatchers("/keys/**").authenticated().
+                anyRequest().permitAll().and().
+
                 // all other requests need to be authenticated
-                        anyRequest().authenticated().and().
                 // make sure we use stateless session
                         exceptionHandling()
                 .and().sessionManagement()

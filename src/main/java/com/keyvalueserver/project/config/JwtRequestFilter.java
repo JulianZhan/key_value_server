@@ -1,6 +1,7 @@
 package com.keyvalueserver.project.config;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -39,10 +40,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // get authorization part of the header
-        final String requestTokenHeader = request.getHeader("Authorization");
+        final String requestTokenHeader = request.getHeader("Auth");
 
         String username = null;
         String jwtToken = null;
+
         // JWT starts with "Bearer ", remove it and only keep the token
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             // extract the token
