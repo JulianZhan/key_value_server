@@ -72,9 +72,7 @@ public class JwtTokenUtil{
 
     /*
     use HS512 algorithm and secret key to sign the JWT
-
      */
-
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))

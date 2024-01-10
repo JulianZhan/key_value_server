@@ -26,6 +26,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    /*
+    this filter first checks if the request has a valid JWT token,
+    which means the request header has Authorization header starting with Bearer
+    and then the username can be extracted from the token payload
+
+    once we get the username, we load the user details from the database
+    then we verify the token and signature, and set the authentication
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
