@@ -1,10 +1,10 @@
 package com.keyvalueserver.project.service;
 
 import java.io.PrintWriter;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.keyvalueserver.project.repository.KeyValueRepository;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -12,6 +12,7 @@ import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVFormat;
@@ -23,12 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 public class KeyValueService {
 
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
+    private final BackupService BackupService;
     private final KeyValueRepository keyValueRepository;
 
     @Autowired
-    public KeyValueService(KeyValueRepository keyValueRepository) {
+    public KeyValueService(BackupService BackupService, KeyValueRepository keyValueRepository) {
+        this.BackupService = BackupService;
         this.keyValueRepository = keyValueRepository;
     }
+
 
     public void setKeyValue(List<KeyValuePair> data) throws IllegalArgumentException {
         // use for each loop to iterate through data list and put key-value pairs into keyValueStore
@@ -40,7 +44,9 @@ public class KeyValueService {
                 throw new IllegalArgumentException("Key or value cannot be null");
             }
             keyValueStore.put(key, value);
-            keyValueRepository.insertOrUpdateKeyValue(keyValuePair);
+            BackupService.addToBackupQueue(new ConcurrentHashMap<Boolean, KeyValuePair>() {{
+                put(true, keyValuePair);
+            }});
         }
     }
 
@@ -77,7 +83,9 @@ public class KeyValueService {
                 throw new IllegalArgumentException("Key cannot be null");
             }
             keyValueStore.remove(key);
-            keyValueRepository.deleteKeyValue(key);
+            BackupService.addToBackupQueue(new ConcurrentHashMap<Boolean, KeyValuePair>() {{
+                put(false, new KeyValuePair(key, null));
+            }});
         }
     }
 
