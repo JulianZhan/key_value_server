@@ -1,7 +1,6 @@
 package com.keyvalueserver.project.service;
 
 import java.io.PrintWriter;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.keyvalueserver.project.repository.KeyValueRepository;
@@ -12,7 +11,6 @@ import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVFormat;
