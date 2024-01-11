@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(KeyNotFoundException.class)
     public ResponseEntity<KeyValueApiResponse> handleKeyNotFoundException(KeyNotFoundException ex, HttpServletRequest request) {
-        KeyValueApiResponse keyValueApiResponse = new KeyValueApiResponse(false, "Key not found", null);
+        KeyValueApiResponse keyValueApiResponse = new KeyValueApiResponse(false, ex.getMessage(), null);
         logErrorWithRequestInfo(ex, request);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(keyValueApiResponse);
     }

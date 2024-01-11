@@ -11,6 +11,10 @@
         ON DUPLICATE KEY UPDATE `value` = #{value}
     </insert>
 
+    <select id="getKeyValue" parameterType="string" resultType="string">
+        SELECT `value` FROM key_value_pair WHERE `key` = #{key}
+    </select>
+
     <delete id="deleteKeyValue" parameterType="string">
         DELETE FROM key_value_pair WHERE `key` = #{key}
     </delete>

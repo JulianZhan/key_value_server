@@ -52,13 +52,23 @@ public class KeyValueService {
             if (keys[i] == null) {
                 throw new IllegalArgumentException("Key cannot be null");
             }
-            String value = keyValueStore.get(keys[i]);
-            if (value == null) {
-                throw new KeyNotFoundException(String.format("Key %s not found", keys[i]));
-            }
-            values[i] = value;
+            values[i] = getValueForKey(keys[i]);
         }
         return values;
+    }
+
+    private String getValueForKey(String key) throws KeyNotFoundException {
+        String value = keyValueStore.get(key);
+        if (value != null) {
+            return value;
+        }
+        value = keyValueRepository.getKeyValue(key);
+        if (value == null) {
+            throw new KeyNotFoundException(String.format("Key %s not found", key));
+        }
+        // update cache
+        keyValueStore.put(key, value);
+        return value;
     }
 
     public void deleteKeyValue(String[] keys) throws IllegalArgumentException {

@@ -18,6 +18,10 @@ public class KeyValueRepository {
         keyValueMapper.insertOrUpdateKeyValue(keyValue);
     }
 
+    public String getKeyValue(String key) {
+        return keyValueMapper.getKeyValue(key);
+    }
+
     public void deleteKeyValue(String key) {
         keyValueMapper.deleteKeyValue(key);
     }
