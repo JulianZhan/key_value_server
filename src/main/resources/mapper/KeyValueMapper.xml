@@ -5,7 +5,7 @@
 
 <mapper namespace="com.keyvalueserver.project.mapper.KeyValueMapper">
 
-    <insert id="insertOrUpdateKeyValue" parameterType="com.keyvalueserver.project.model.KeyValuePair">
+    <insert id="insertOrUpdateKeyValue" parameterType="KeyValuePair">
         INSERT INTO key_value_pair (`key`, `value`)
         VALUES (#{key}, #{value})
         ON DUPLICATE KEY UPDATE `value` = #{value}

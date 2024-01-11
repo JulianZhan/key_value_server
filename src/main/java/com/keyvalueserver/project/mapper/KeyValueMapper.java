@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 @Mapper
-@Component
+@Repository
 public interface KeyValueMapper {
     void insertOrUpdateKeyValue(KeyValuePair keyValue);
     void deleteKeyValue(String key);
