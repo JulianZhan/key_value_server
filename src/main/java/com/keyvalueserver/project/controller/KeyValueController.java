@@ -49,7 +49,7 @@ public class KeyValueController {
                                     @Content(
                                             mediaType = "application/json",
                                             schema = @Schema(description = "Success",
-                                                    implementation = String.class)
+                                                    implementation = KeyValueApiResponse.class)
                                     )
                             }),
             }
@@ -76,7 +76,7 @@ public class KeyValueController {
                                     @Content(
                                             mediaType = "application/json",
                                             schema = @Schema(description = "Success",
-                                                    implementation = String.class)
+                                                    implementation = KeyValueApiResponse.class)
                                     )
                             }),
             }
@@ -107,7 +107,7 @@ public class KeyValueController {
                                     @Content(
                                             mediaType = "application/json",
                                             schema = @Schema(description = "Success",
-                                                    implementation = String.class)
+                                                    implementation = KeyValueApiResponse.class)
                                     )
                             }),
             }
@@ -118,7 +118,8 @@ public class KeyValueController {
         return ResponseEntity.status(HttpStatus.OK).body(new KeyValueApiResponse(true, "Key deleted successfully", null));
     }
 
-    @Operation(summary = "Download all key-value pairs as CSV file",
+
+    @Operation(summary = "Download key-value pairs as CSV file",
             parameters = {
                     @Parameter(in = ParameterIn.HEADER, name = "Auth", required = true,
                             description = "JWT",
@@ -129,8 +130,7 @@ public class KeyValueController {
                             content = {
                                     @Content(
                                             mediaType = "text/csv",
-                                            schema = @Schema(description = "Success",
-                                                    implementation = String.class)
+                                            schema = @Schema(description = "Success")
                                     )
                             }),
             }
