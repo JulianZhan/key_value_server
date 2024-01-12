@@ -44,6 +44,7 @@ public class KeyValueService {
                 throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
             keyValueStore.put(key, value);
+            // add backup operation to the queue and end the request to send ack to client
             backupService.addToBackupQueue(new BackupOperation(true, keyValuePair));
         }
     }
@@ -70,7 +71,7 @@ public class KeyValueService {
         if (value == null) {
             throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
         }
-        // update cache
+        // if data is found in database, put it into keyValueStore as cache
         keyValueStore.put(key, value);
         return value;
     }
@@ -88,12 +89,13 @@ public class KeyValueService {
     public void exportCSVFile(PrintWriter writer) throws IOException {
         // Reference: https://springhow.com/spring-boot-export-to-csv/
         // receive PrintWriter from HttpServletResponse in KeyValueController
-        CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
-        // print header
-        csvPrinter.printRecord("Key", "Value");
-        // use for loop to print each key-value pair
-        for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
-            csvPrinter.printRecord(entry.getKey(), entry.getValue());
+        try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT))
+            {   // print header
+                csvPrinter.printRecord("Key", "Value");
+                // use for loop to print each key-value pair
+                for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
+                    csvPrinter.printRecord(entry.getKey(), entry.getValue());
+            }
         }
     }
 }

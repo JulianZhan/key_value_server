@@ -43,6 +43,6 @@ public class GlobalExceptionHandler {
 
     private void logErrorWithRequestInfo(Exception ex, HttpServletRequest request, KeyValueApiResponse errorResponse) {
         String requestUrl = request.getRequestURL().toString();
-        log.error("Exception occurred at URL: " + requestUrl, "Exception: " + ex, "Response: " + errorResponse);
+        log.error(String.format("Exception occurred at URL: %s | Exception: %s | Response: %s", requestUrl, ex, errorResponse));
     }
 }

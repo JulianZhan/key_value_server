@@ -35,10 +35,10 @@ public class BackupService extends Thread {
                 // take() will block the thread until there is data in the queue
                 BackupOperation operation = backupQueue.take();
                 if (operation.isInsert()) {
-                    // if the data key contains true, it means that the data is to be inserted or updated
+                    // if operation is insert, insert or update the key value pair in the database
                     keyValueRepository.insertOrUpdateKeyValue(operation.getKeyValuePair());
                 } else {
-                    // if the data contains false, it means that the data is to be deleted
+                    // if operation is delete, delete the key value pair from the database
                     keyValueRepository.deleteKeyValue(operation.getKeyValuePair().getKey());
                 }
             } catch (InterruptedException e) {
@@ -48,7 +48,8 @@ public class BackupService extends Thread {
         }
     }
 
-    public void addToBackupQueue(BackupOperation data) {
-        backupQueue.add(data);
+    // add backup operation to the queue
+    public void addToBackupQueue(BackupOperation operation) {
+        backupQueue.add(operation);
     }
 }
