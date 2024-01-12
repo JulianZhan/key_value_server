@@ -14,9 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.keyvalueserver.project.service.KeyValueService;
 import com.keyvalueserver.project.model.KeyValuePOJO;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 
 class KeyValueServiceMultithreadingTest {
@@ -35,7 +33,6 @@ class KeyValueServiceMultithreadingTest {
         keyValueService = new KeyValueService(backupService, keyValueRepository);
         numThreads = 100;
         numIterations = 100000;
-        Mockito.when(keyValueRepository.getKeyValue(String.valueOf(String[].class))).thenReturn(null);
     }
 
     @Test

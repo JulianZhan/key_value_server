@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.verification.VerificationMode;
+import org.mockito.verification.VerificationWithTimeout;
 
 import static org.mockito.Mockito.*;
 
@@ -29,11 +31,8 @@ class BackupServiceTest {
     void addToBackupQueueInsertOperation() throws InterruptedException {
         KeyValuePair pair = new KeyValuePair("key", "value");
         BackupOperation operation = new BackupOperation(true, pair);
-
         backupService.addToBackupQueue(operation);
-//        Thread.sleep(1000); // Wait for the operation to be processed
-
-        verify(keyValueRepository, timeout(1000)).insertOrUpdateKeyValue(pair);
+        verify(keyValueRepository, timeout(50)).insertOrUpdateKeyValue(pair);
     }
 
     @Test
@@ -42,9 +41,7 @@ class BackupServiceTest {
         BackupOperation operation = new BackupOperation(false, pair);
 
         backupService.addToBackupQueue(operation);
-        Thread.sleep(1000); // Wait for the operation to be processed
-
-        verify(keyValueRepository, timeout(1000)).deleteKeyValue("key");
+        verify(keyValueRepository, timeout(50)).deleteKeyValue("key");
     }
 }
 

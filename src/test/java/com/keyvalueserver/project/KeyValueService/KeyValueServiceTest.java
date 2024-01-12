@@ -67,7 +67,6 @@ public class KeyValueServiceTest {
     void testNullValueInSet() {
         List<KeyValuePair> keyValuePairs = new ArrayList<>();
         keyValuePairs.add(new KeyValuePair("key1", null));
-
         assertThrows(IllegalArgumentException.class, () -> keyValueService.setKeyValue(keyValuePairs));
     }
 

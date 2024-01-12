@@ -21,35 +21,41 @@ class BackupServiceMultithreadingTest {
 
     @Mock
     private KeyValueRepository keyValueRepository;
-
     private BackupService backupService;
+    private int numThreads;
+    private int numIterations;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         backupService = new BackupService(keyValueRepository);
+        // start the backup service
         backupService.start();
+        numThreads = 100;
+        numIterations = 100000;
     }
 
     @Test
     void testBackupServiceUnderLoad() throws InterruptedException {
-        int numberOfThreads = 10; // Number of concurrent threads
-        ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < numIterations; i++) {
             executor.submit(() -> {
-                // Simulate an operation, e.g., insert or delete
                 KeyValuePair pair = new KeyValuePair("key", "value");
+                // add insert and delete operations for both numIterations times to the backup queue
                 BackupOperation operation = new BackupOperation(true, pair);
+                backupService.addToBackupQueue(operation);
+                operation = new BackupOperation(false, pair);
                 backupService.addToBackupQueue(operation);
             });
         }
 
-        // Shutdown executor and wait for tasks to complete
+        // shutdown the executor and wait one second for all threads to finish
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.SECONDS);
 
-        // Verify that the method was called the expected number of times
-        verify(keyValueRepository, timeout(1000).times(numberOfThreads)).insertOrUpdateKeyValue(any(KeyValuePair.class));
+        // verify that insertOrUpdateKeyValue and deleteKeyValue were called numIterations times
+        verify(keyValueRepository, timeout(1000).times(numIterations)).insertOrUpdateKeyValue(any(KeyValuePair.class));
+        verify(keyValueRepository, timeout(1000).times(numIterations)).deleteKeyValue(any(String.class));
     }
 }
