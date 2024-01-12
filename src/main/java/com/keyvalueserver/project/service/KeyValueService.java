@@ -12,6 +12,7 @@ import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import com.keyvalueserver.project.exceptions.ErrorMessage;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVFormat;
@@ -40,7 +41,7 @@ public class KeyValueService {
             String value = keyValuePair.getValue();
             // if key or value is null, throw exception, which will be handled by GlobalExceptionHandler later
             if (key == null || value == null) {
-                throw new IllegalArgumentException("Key or value cannot be null");
+                throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
             keyValueStore.put(key, value);
             backupService.addToBackupQueue(new BackupOperation(true, keyValuePair));
@@ -53,7 +54,7 @@ public class KeyValueService {
         for (int i = 0; i < keys.length; i++) {
             // if key or value is null, throw exception, which will be handled by GlobalExceptionHandler later
             if (keys[i] == null) {
-                throw new IllegalArgumentException("Key cannot be null");
+                throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
             values[i] = getValueForKey(keys[i]);
         }
@@ -67,7 +68,7 @@ public class KeyValueService {
         }
         value = keyValueRepository.getKeyValue(key);
         if (value == null) {
-            throw new KeyNotFoundException(String.format("Key %s not found", key));
+            throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
         }
         // update cache
         keyValueStore.put(key, value);
@@ -77,7 +78,7 @@ public class KeyValueService {
     public void deleteKeyValue(String[] keys) throws IllegalArgumentException {
         for (String key : keys) {
             if (key == null) {
-                throw new IllegalArgumentException("Key cannot be null");
+                throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
             keyValueStore.remove(key);
             backupService.addToBackupQueue(new BackupOperation(false, new KeyValuePair(key, null)));

@@ -15,34 +15,34 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(KeyNotFoundException.class)
     public ResponseEntity<KeyValueApiResponse> handleKeyNotFoundException(KeyNotFoundException ex, HttpServletRequest request) {
-        KeyValueApiResponse keyValueApiResponse = new KeyValueApiResponse(false, ex.getMessage(), null);
-        logErrorWithRequestInfo(ex, request);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(keyValueApiResponse);
+        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, ex.getMessage(), null);
+        logErrorWithRequestInfo(ex, request, errorResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<KeyValueApiResponse> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
-        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, "key or value cannot be null", null);
-        logErrorWithRequestInfo(ex, request);
+        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, ex.getMessage(), null);
+        logErrorWithRequestInfo(ex, request, errorResponse);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<KeyValueApiResponse> handleIOException(IOException ex, HttpServletRequest request) {
-        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, "Error reading request body", null);
-        logErrorWithRequestInfo(ex, request);
+        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, ErrorMessage.IO_EXCEPTION, null);
+        logErrorWithRequestInfo(ex, request, errorResponse);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<KeyValueApiResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
-        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, "Internal server error", null);
-        logErrorWithRequestInfo(ex, request);
+        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, ErrorMessage.INTERNAL_SERVER_ERROR, null);
+        logErrorWithRequestInfo(ex, request, errorResponse);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
-    private void logErrorWithRequestInfo(Exception ex, HttpServletRequest request) {
+    private void logErrorWithRequestInfo(Exception ex, HttpServletRequest request, KeyValueApiResponse errorResponse) {
         String requestUrl = request.getRequestURL().toString();
-        log.error("Exception occurred at URL: " + requestUrl, ex);
+        log.error("Exception occurred at URL: " + requestUrl, "Exception: " + ex, "Response: " + errorResponse);
     }
 }
