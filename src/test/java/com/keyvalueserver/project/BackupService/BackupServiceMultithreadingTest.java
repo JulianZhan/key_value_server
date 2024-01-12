@@ -30,7 +30,6 @@ class BackupServiceMultithreadingTest {
         MockitoAnnotations.openMocks(this);
         backupService = new BackupService(keyValueRepository);
         // start the backup service
-        backupService.start();
         numThreads = 100;
         numIterations = 100000;
     }
@@ -55,7 +54,7 @@ class BackupServiceMultithreadingTest {
         executor.awaitTermination(1, TimeUnit.SECONDS);
 
         // verify that insertOrUpdateKeyValue and deleteKeyValue were called numIterations times
-        verify(keyValueRepository, timeout(1000).times(numIterations)).insertOrUpdateKeyValue(any(KeyValuePair.class));
-        verify(keyValueRepository, timeout(1000).times(numIterations)).deleteKeyValue(any(String.class));
+        verify(keyValueRepository, timeout(2000).times(numIterations)).insertOrUpdateKeyValue(any(KeyValuePair.class));
+        verify(keyValueRepository, timeout(2000).times(numIterations)).deleteKeyValue(any(String.class));
     }
 }

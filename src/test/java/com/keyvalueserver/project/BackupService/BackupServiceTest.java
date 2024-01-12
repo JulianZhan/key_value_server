@@ -24,7 +24,6 @@ class BackupServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         backupService = new BackupService(keyValueRepository);
-        backupService.start();
     }
 
     @Test
