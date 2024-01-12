@@ -1,19 +1,18 @@
 package com.keyvalueserver.project.service;
 
+import com.keyvalueserver.project.model.BackupOperation;
 import com.keyvalueserver.project.repository.KeyValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import com.keyvalueserver.project.model.KeyValuePair;
 
 import javax.annotation.PostConstruct;
 
 @Service
 public class BackupService extends Thread {
 
-    private final BlockingQueue<ConcurrentHashMap<Boolean, KeyValuePair>> backupQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<BackupOperation> backupQueue = new LinkedBlockingQueue<>();
     private final KeyValueRepository keyValueRepository;
 
     @Autowired
@@ -34,15 +33,13 @@ public class BackupService extends Thread {
         while (true) {
             try {
                 // take() will block the thread until there is data in the queue
-                ConcurrentHashMap<Boolean, KeyValuePair> data = backupQueue.take();
-                if (data.containsKey(true)) {
+                BackupOperation operation = backupQueue.take();
+                if (operation.isInsert()) {
                     // if the data key contains true, it means that the data is to be inserted or updated
-                    KeyValuePair keyValuePair = data.get(true);
-                    keyValueRepository.insertOrUpdateKeyValue(keyValuePair);
+                    keyValueRepository.insertOrUpdateKeyValue(operation.getKeyValuePair());
                 } else {
                     // if the data contains false, it means that the data is to be deleted
-                    KeyValuePair keyValuePair = data.get(false);
-                    keyValueRepository.deleteKeyValue(keyValuePair.getKey());
+                    keyValueRepository.deleteKeyValue(operation.getKeyValuePair().getKey());
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -51,7 +48,7 @@ public class BackupService extends Thread {
         }
     }
 
-    public void addToBackupQueue(ConcurrentHashMap<Boolean, KeyValuePair> data) {
+    public void addToBackupQueue(BackupOperation data) {
         backupQueue.add(data);
     }
 }

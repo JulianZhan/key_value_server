@@ -3,6 +3,7 @@ package com.keyvalueserver.project.service;
 import java.io.PrintWriter;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.keyvalueserver.project.model.BackupOperation;
 import com.keyvalueserver.project.repository.KeyValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 public class KeyValueService {
 
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
-    private final BackupService BackupService;
+    private final BackupService backupService;
     private final KeyValueRepository keyValueRepository;
 
     @Autowired
-    public KeyValueService(BackupService BackupService, KeyValueRepository keyValueRepository) {
-        this.BackupService = BackupService;
+    public KeyValueService(BackupService backupService, KeyValueRepository keyValueRepository) {
+        this.backupService = backupService;
         this.keyValueRepository = keyValueRepository;
     }
 
@@ -42,9 +43,7 @@ public class KeyValueService {
                 throw new IllegalArgumentException("Key or value cannot be null");
             }
             keyValueStore.put(key, value);
-            BackupService.addToBackupQueue(new ConcurrentHashMap<Boolean, KeyValuePair>() {{
-                put(true, keyValuePair);
-            }});
+            backupService.addToBackupQueue(new BackupOperation(true, keyValuePair));
         }
     }
 
@@ -81,9 +80,7 @@ public class KeyValueService {
                 throw new IllegalArgumentException("Key cannot be null");
             }
             keyValueStore.remove(key);
-            BackupService.addToBackupQueue(new ConcurrentHashMap<Boolean, KeyValuePair>() {{
-                put(false, new KeyValuePair(key, null));
-            }});
+            backupService.addToBackupQueue(new BackupOperation(false, new KeyValuePair(key, null)));
         }
     }
 
