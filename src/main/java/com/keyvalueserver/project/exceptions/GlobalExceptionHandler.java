@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.io.IOException;
 import com.keyvalueserver.project.model.KeyValueApiResponse;
 import javax.servlet.http.HttpServletRequest;
+import com.google.gson.JsonSyntaxException;
 
 @Slf4j
 @ControllerAdvice
@@ -30,6 +31,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IOException.class)
     public ResponseEntity<KeyValueApiResponse> handleIOException(IOException ex, HttpServletRequest request) {
         KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, ErrorMessage.IO_EXCEPTION, null);
+        logErrorWithRequestInfo(ex, request, errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(JsonSyntaxException.class)
+    public ResponseEntity<KeyValueApiResponse> handleJsonSyntaxException(JsonSyntaxException ex, HttpServletRequest request) {
+        KeyValueApiResponse errorResponse = new KeyValueApiResponse(false, ErrorMessage.INVALID_REQUEST, null);
         logErrorWithRequestInfo(ex, request, errorResponse);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }

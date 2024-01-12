@@ -1,5 +1,6 @@
 package com.keyvalueserver.project.controller;
 
+import com.keyvalueserver.project.exceptions.ErrorMessage;
 import com.keyvalueserver.project.model.KeyValueApiResponse;
 import com.keyvalueserver.project.service.KeyValueService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +59,6 @@ public class KeyValueController {
     public ResponseEntity<KeyValueApiResponse> getKeyValue(@PathVariable("key") String[] keys) {
         String[] value = keyValueService.getKeyValue(keys);
         return ResponseEntity.status(HttpStatus.OK).body(new KeyValueApiResponse(true, "Key retrieved successfully", value));
-
     }
 
     @Operation(summary = "Add key-value pair",
@@ -88,6 +88,9 @@ public class KeyValueController {
         try (BufferedReader reader = request.getReader()) {
             // convert JSON to predefined POJO
             KeyValuePOJO keyValuePOJO = gson.fromJson(reader, KeyValuePOJO.class);
+            if (keyValuePOJO == null || keyValuePOJO.getData() == null) {
+                throw new IllegalArgumentException(ErrorMessage.INVALID_REQUEST);
+            }
             // use getter to access data
             List<KeyValuePair> data = keyValuePOJO.getData();
             keyValueService.setKeyValue(data);
