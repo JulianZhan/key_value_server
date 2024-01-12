@@ -1,5 +1,7 @@
-package com.keyvalueserver.project.KeyValueServiceTest;
+package com.keyvalueserver.project.KeyValueService;
 
+import com.keyvalueserver.project.repository.KeyValueRepository;
+import com.keyvalueserver.project.service.BackupService;
 import com.keyvalueserver.project.service.KeyValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,16 +12,24 @@ import java.util.ArrayList;
 import java.util.List;
 import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
-
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 
 public class KeyValueServiceTest {
+
+    @Mock
+    private BackupService backupService;
+
+    @Mock
+    private KeyValueRepository keyValueRepository;
 
     private KeyValueService keyValueService;
 
     @BeforeEach
     void setUp() {
-        keyValueService = new KeyValueService();
+        MockitoAnnotations.openMocks(this);
+        keyValueService = new KeyValueService(backupService, keyValueRepository);
     }
 
     @Test

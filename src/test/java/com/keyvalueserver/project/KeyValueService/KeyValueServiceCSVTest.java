@@ -1,10 +1,15 @@
-package com.keyvalueserver.project.KeyValueServiceTest;
+package com.keyvalueserver.project.KeyValueService;
 
+import com.keyvalueserver.project.repository.KeyValueRepository;
+import com.keyvalueserver.project.service.BackupService;
 import com.keyvalueserver.project.service.KeyValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.keyvalueserver.project.model.KeyValuePair;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.io.StringWriter;
@@ -18,10 +23,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class KeyValueServiceCSVTest {
 
     private KeyValueService keyValueService;
+    @Mock
+    private BackupService backupService;
+    @Mock
+    private KeyValueRepository keyValueRepository;
 
     @BeforeEach
     void setUp() {
-        keyValueService = new KeyValueService();
+        MockitoAnnotations.openMocks(this);
+        keyValueService = new KeyValueService(backupService, keyValueRepository);
     }
 
     @Test

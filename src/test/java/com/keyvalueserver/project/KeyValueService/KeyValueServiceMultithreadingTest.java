@@ -1,7 +1,9 @@
-package com.keyvalueserver.project.KeyValueServiceTest;
+package com.keyvalueserver.project.KeyValueService;
 
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 import com.keyvalueserver.project.model.KeyValuePair;
+import com.keyvalueserver.project.repository.KeyValueRepository;
+import com.keyvalueserver.project.service.BackupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -11,18 +13,29 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 import com.keyvalueserver.project.service.KeyValueService;
 import com.keyvalueserver.project.model.KeyValuePOJO;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 
 class KeyValueServiceMultithreadingTest {
     private KeyValueService keyValueService;
+    @Mock
+    private BackupService backupService;
+
+    @Mock
+    private KeyValueRepository keyValueRepository;
     private int numThreads;
     private int numIterations;
 
     @BeforeEach
     void setUp() {
-        keyValueService = new KeyValueService();
+        MockitoAnnotations.openMocks(this);
+        keyValueService = new KeyValueService(backupService, keyValueRepository);
         numThreads = 100;
         numIterations = 100000;
+        Mockito.when(keyValueRepository.getKeyValue(String.valueOf(String[].class))).thenReturn(null);
     }
 
     @Test
