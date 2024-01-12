@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.timeout;
@@ -51,7 +50,6 @@ class BackupServiceMultithreadingTest {
 
         // shutdown the executor and wait one second for all threads to finish
         executor.shutdown();
-        executor.awaitTermination(1, TimeUnit.SECONDS);
 
         // verify that insertOrUpdateKeyValue and deleteKeyValue were called numIterations times
         verify(keyValueRepository, timeout(2000).times(numIterations)).insertOrUpdateKeyValue(any(KeyValuePair.class));

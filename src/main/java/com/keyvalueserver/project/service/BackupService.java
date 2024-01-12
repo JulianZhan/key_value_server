@@ -9,14 +9,18 @@ public class BackupService extends BackupWorker {
 
     @Autowired
     public BackupService(KeyValueRepository keyValueRepository) {
-        // call the constructor of the parent class, and inject the keyValueRepository
+        /*
+        call the constructor of the parent class, and inject the keyValueRepository
+        this will allow the parent class to use the keyValueRepository
+        and the child class to use full functionality of the parent class directly
+         */
         super(keyValueRepository);
         // start the worker thread
         startWorkerThread();
     }
 
     private void startWorkerThread() {
-        // init this class as a thread and start it
+        // run the current class as a thread
         Thread backupWorkerThread = new Thread(this);
         backupWorkerThread.start();
     }
