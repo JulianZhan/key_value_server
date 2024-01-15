@@ -23,15 +23,15 @@ public class JwtTokenUtil{
     private String secret;
 
     public String getUsernameFromToken(String token) {
-        return getClaimFromToken(token, Claims -> Claims.getSubject());
+        return getClaimFromToken(token, Claims::getSubject);
     }
 
     public Date getIssuedAtDateFromToken(String token) {
-        return getClaimFromToken(token, Claims -> Claims.getIssuedAt());
+        return getClaimFromToken(token, Claims::getIssuedAt);
     }
 
     public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims -> Claims.getExpiration());
+        return getClaimFromToken(token, Claims::getExpiration);
     }
 
     /*

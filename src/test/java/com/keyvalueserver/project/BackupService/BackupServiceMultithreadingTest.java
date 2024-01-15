@@ -28,7 +28,6 @@ class BackupServiceMultithreadingTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         backupService = new BackupService(keyValueRepository);
-        // start the backup service
         numThreads = 100;
         numIterations = 100000;
     }
