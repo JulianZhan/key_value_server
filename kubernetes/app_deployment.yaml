@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+# name of the deployment
+metadata:
+  name: spring-app-deployment
+spec:
+#  number of pods
+  replicas: 1
+  selector:
+    matchLabels:
+#      the effect of this deployment will be applied to pods with label "app: spring-app"
+      app: spring-app
+  template:
+    metadata:
+      labels:
+#        this pod carries the label "app: spring-app"
+        app: spring-app
+    spec:
+      containers:
+        - name: spring-app
+          image: julianzhan/key_value_server:0.1.2
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 200m
+            requests:
+              cpu: 100m
