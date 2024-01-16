@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 .json
 *.json
+*.sh
 
 ### STS ###
 .apt_generated
