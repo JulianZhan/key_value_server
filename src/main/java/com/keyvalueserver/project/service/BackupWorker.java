@@ -1,6 +1,7 @@
 package com.keyvalueserver.project.service;
 
 import com.keyvalueserver.project.model.BackupOperation;
+import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.model.OperationType;
 import com.keyvalueserver.project.repository.KeyValueRepository;
 
@@ -9,10 +10,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class BackupWorker implements Runnable {
     protected final BlockingQueue<BackupOperation> backupQueue = new LinkedBlockingQueue<>();
-    protected final KeyValueRepository keyValueRepository;
+    protected final DataOperationService dataOperationService;
 
-    public BackupWorker(KeyValueRepository keyValueRepository) {
-        this.keyValueRepository = keyValueRepository;
+    public BackupWorker(DataOperationService dataOperationService) {
+        this.dataOperationService = dataOperationService;
     }
 
     @Override
@@ -36,12 +37,15 @@ public class BackupWorker implements Runnable {
     }
 
     protected void processOperation(BackupOperation operation) {
+        OperationType operationType = operation.getOperationType();
+        KeyValuePair keyValuePair = operation.getKeyValuePair();
         // if the operation is insert, insert or update the key-value pair
-        if (operation.getOperationType().equals(OperationType.INSERT)) {
-            keyValueRepository.insertOrUpdateKeyValue(operation.getKeyValuePair());
-        } else if (operation.getOperationType().equals(OperationType.DELETE)) {
+        if (operationType.equals(OperationType.INSERT)) {
+            dataOperationService.insertOrUpdateKeyValue(keyValuePair);
+        } else if (operationType.equals(OperationType.DELETE)) {
             // if the operation is delete, delete the key-value pair
-            keyValueRepository.deleteKeyValue(operation.getKeyValuePair().getKey());
+            String key = keyValuePair.getKey();
+            dataOperationService.deleteKeyValue(key);
         }
     }
 

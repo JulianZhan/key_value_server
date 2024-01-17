@@ -26,16 +26,16 @@ public class KeyValueService {
 
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
     private final BackupService backupService;
-    private final KeyValueRepository keyValueRepository;
+    private final DataOperationService dataOperationService;
     private final BackupOperationFactory insertOperationFactory;
     private final BackupOperationFactory deleteOperationFactory;
 
     @Autowired
-    public KeyValueService(BackupService backupService, KeyValueRepository keyValueRepository,
+    public KeyValueService(BackupService backupService, DataOperationService dataOperationService,
                            @Qualifier("insertBackupOperationFactory") BackupOperationFactory insertOperationFactory,
                             @Qualifier("deleteBackupOperationFactory") BackupOperationFactory deleteOperationFactory) {
         this.backupService = backupService;
-        this.keyValueRepository = keyValueRepository;
+        this.dataOperationService = dataOperationService;
         this.insertOperationFactory = insertOperationFactory;
         this.deleteOperationFactory = deleteOperationFactory;
     }
@@ -68,7 +68,8 @@ public class KeyValueService {
             if (keys[i] == null) {
                 throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
-            values[i] = getValueForKey(keys[i]);
+            String key = keys[i];
+            values[i] = getValueForKey(key);
         }
         return values;
     }
@@ -79,7 +80,7 @@ public class KeyValueService {
             return value;
         }
         // TODO: unify interface for backup operations
-        value = keyValueRepository.getKeyValue(key);
+        value = dataOperationService.getKeyValue(key);
         if (value == null) {
             throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
         }

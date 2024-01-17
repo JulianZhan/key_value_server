@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 public class BackupService extends BackupWorker {
 
     @Autowired
-    public BackupService(KeyValueRepository keyValueRepository) {
+    public BackupService(DataOperationService dataOperationService) {
         /*
         call the constructor of the parent class, and inject the keyValueRepository
         this will allow the parent class to use the keyValueRepository
         and the child class to use full functionality of the parent class directly
          */
-        super(keyValueRepository);
+        super(dataOperationService);
         // start the worker thread
         startWorkerThread();
     }
