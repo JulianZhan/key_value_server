@@ -3,12 +3,13 @@ package com.keyvalueserver.project.service;
 import java.io.PrintWriter;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.keyvalueserver.project.model.BackupOperation;
+import com.keyvalueserver.project.model.*;
 import com.keyvalueserver.project.repository.KeyValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import com.keyvalueserver.project.model.KeyValuePair;
+
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
 import java.io.IOException;
 import java.util.Map;
@@ -26,11 +27,17 @@ public class KeyValueService {
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
     private final BackupService backupService;
     private final KeyValueRepository keyValueRepository;
+    private final BackupOperationFactory insertOperationFactory;
+    private final BackupOperationFactory deleteOperationFactory;
 
     @Autowired
-    public KeyValueService(BackupService backupService, KeyValueRepository keyValueRepository) {
+    public KeyValueService(BackupService backupService, KeyValueRepository keyValueRepository,
+                           @Qualifier("insertBackupOperationFactory") BackupOperationFactory insertOperationFactory,
+                            @Qualifier("deleteBackupOperationFactory") BackupOperationFactory deleteOperationFactory) {
         this.backupService = backupService;
         this.keyValueRepository = keyValueRepository;
+        this.insertOperationFactory = insertOperationFactory;
+        this.deleteOperationFactory = deleteOperationFactory;
     }
 
 
@@ -45,7 +52,10 @@ public class KeyValueService {
             }
             keyValueStore.put(key, value);
             // add backup operation to the queue and end the request to send ack to client
-            backupService.addToBackupQueue(new BackupOperation(true, keyValuePair));
+            // TODO: send ack after db backup
+            // TODO: be careful with chaining
+            BackupOperation operation = insertOperationFactory.createBackupOperation(keyValuePair);
+            backupService.addToBackupQueue(operation);
         }
     }
 
@@ -54,6 +64,7 @@ public class KeyValueService {
         // use for loop to iterate through keys array and get values from keyValueStore
         for (int i = 0; i < keys.length; i++) {
             // if key or value is null, throw exception, which will be handled by GlobalExceptionHandler later
+            // REMINDER: consider reversing position
             if (keys[i] == null) {
                 throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
@@ -67,6 +78,7 @@ public class KeyValueService {
         if (value != null) {
             return value;
         }
+        // TODO: unify interface for backup operations
         value = keyValueRepository.getKeyValue(key);
         if (value == null) {
             throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
@@ -82,7 +94,9 @@ public class KeyValueService {
                 throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
             keyValueStore.remove(key);
-            backupService.addToBackupQueue(new BackupOperation(false, new KeyValuePair(key, null)));
+            KeyValuePair keyValuePair = new KeyValuePair(key, null);
+            BackupOperation operation = deleteOperationFactory.createBackupOperation(keyValuePair);
+            backupService.addToBackupQueue(operation);
         }
     }
 

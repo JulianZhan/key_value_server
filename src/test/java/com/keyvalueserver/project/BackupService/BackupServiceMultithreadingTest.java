@@ -40,9 +40,11 @@ class BackupServiceMultithreadingTest {
             executor.submit(() -> {
                 KeyValuePair pair = new KeyValuePair("key", "value");
                 // add insert and delete operations for both numIterations times to the backup queue
+                // TODO: Builder
                 BackupOperation operation = new BackupOperation(true, pair);
                 backupService.addToBackupQueue(operation);
                 operation = new BackupOperation(false, pair);
+//                operation.delete
                 backupService.addToBackupQueue(operation);
             });
         }
