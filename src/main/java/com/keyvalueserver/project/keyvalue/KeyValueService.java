@@ -52,8 +52,8 @@ public class KeyValueService {
             // TODO: send ack after db backup
             // TODO: be careful with chaining
             BackupOperation operation = backupOperationFactory.createBackupOperation(keyValuePair, OperationType.INSERT);
-            CompletableFuture<Void> completableFuture = backupService.addToBackupQueue(operation);
-            completableFuture.join();
+            backupService.addToBackupQueue(operation);
+            // signal
         }
     }
 
@@ -98,8 +98,7 @@ public class KeyValueService {
             keyValueStore.remove(key);
             KeyValuePair keyValuePair = new KeyValuePair(key, null);
             BackupOperation operation = backupOperationFactory.createBackupOperation(keyValuePair, OperationType.DELETE);
-            CompletableFuture<Void> completableFuture = backupService.addToBackupQueue(operation);
-            completableFuture.join();
+            backupService.addToBackupQueue(operation);
         }
     }
 

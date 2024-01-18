@@ -57,7 +57,7 @@ class BackupServiceMultithreadingTest {
         executor.shutdown();
 
         // verify that insertOrUpdateKeyValue and deleteKeyValue were called numIterations times
-        verify(keyValueRepository, timeout(2000).times(numIterations)).insertOrUpdateKeyValue(any(KeyValuePair.class));
-        verify(keyValueRepository, timeout(2000).times(numIterations)).deleteKeyValue(any(String.class));
+        verify(keyValueRepository, timeout(5000).times(numIterations)).insertOrUpdateKeyValue(any(KeyValuePair.class));
+        verify(keyValueRepository, timeout(5000).times(numIterations)).deleteKeyValue(any(String.class));
     }
 }

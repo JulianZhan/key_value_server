@@ -16,7 +16,7 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <typeAliases>
-        <package name="com.keyvalueserver.project.model"/>
+        <package name="com.keyvalueserver.project.keyvalue"/>
     </typeAliases>
     <mappers>
         <mapper resource="mapper/KeyValueMapper.xml"/>

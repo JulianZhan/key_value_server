@@ -22,9 +22,6 @@ import com.google.gson.Gson;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
-import com.keyvalueserver.project.keyvalue.KeyValuePOJO;
-import com.keyvalueserver.project.keyvalue.KeyValuePair;
-
 @RestController
 @Slf4j
 @RequestMapping("/keys")

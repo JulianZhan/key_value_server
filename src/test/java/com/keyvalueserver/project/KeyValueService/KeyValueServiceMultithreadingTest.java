@@ -44,8 +44,6 @@ class KeyValueServiceMultithreadingTest {
 
         when(SimpleBackupOperationFactory.createBackupOperation(any(KeyValuePair.class), any(OperationType.class)))
                 .thenReturn(mockBackupOperation);
-        CompletableFuture<Void> completedFuture = CompletableFuture.completedFuture(null);
-        when(backupService.addToBackupQueue(eq(mockBackupOperation))).thenReturn(completedFuture);
 
         keyValueService = new KeyValueService(backupService, SimpleBackupOperationFactory, backupRetrievalService);
 

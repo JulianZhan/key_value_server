@@ -37,7 +37,6 @@ public class BackupWorker implements Runnable {
 
     protected void processEntryQueue(BackupQueueEntry entry) {
         BackupOperation operation = entry.getBackupOperation();
-        CompletableFuture<Void> completableFuture = entry.getCompletableFuture();
         OperationType operationType = operation.getOperationType();
         KeyValuePair keyValuePair = operation.getKeyValuePair();
         // if the operation is insert, insert or update the key-value pair
@@ -48,13 +47,16 @@ public class BackupWorker implements Runnable {
             String key = keyValuePair.getKey();
             keyValueRepository.deleteKeyValue(key);
         }
-        completableFuture.complete(null);
+        entry.complete();
     }
 
-    public CompletableFuture<Void> addToBackupQueue(BackupOperation operation) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        BackupQueueEntry entry = new BackupQueueEntry(operation, future);
+    public void addToBackupQueue(BackupOperation operation) {
+        BackupQueueEntry entry = new BackupQueueEntry(operation);
         backupQueue.add(entry);
-        return future;
+        try {
+            entry.awaitCompletion();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

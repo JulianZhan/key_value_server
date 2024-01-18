@@ -1,16 +1,24 @@
 package com.keyvalueserver.project.backup_support;
 
 import lombok.Getter;
-
-import java.util.concurrent.CompletableFuture;
-
 @Getter
 public class BackupQueueEntry {
     private final BackupOperation backupOperation;
-    private final CompletableFuture<Void> completableFuture;
+    private boolean isCompleted = false;
 
-    public BackupQueueEntry(BackupOperation backupOperation, CompletableFuture<Void> completableFuture) {
+    public BackupQueueEntry(BackupOperation backupOperation) {
         this.backupOperation = backupOperation;
-        this.completableFuture = completableFuture;
+    }
+
+    // methods to set and check completion
+    public synchronized void complete() {
+        this.isCompleted = true;
+        notifyAll();
+    }
+
+    public synchronized void awaitCompletion() throws InterruptedException {
+        while (!isCompleted) {
+            wait();
+        }
     }
 }
