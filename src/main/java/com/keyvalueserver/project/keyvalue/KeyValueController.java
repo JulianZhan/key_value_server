@@ -1,8 +1,6 @@
-package com.keyvalueserver.project.controller;
+package com.keyvalueserver.project.keyvalue;
 
-import com.keyvalueserver.project.exceptions.ErrorMessage;
-import com.keyvalueserver.project.model.KeyValueApiResponse;
-import com.keyvalueserver.project.service.KeyValueService;
+import com.keyvalueserver.project.exceptions_support.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -24,8 +22,8 @@ import com.google.gson.Gson;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
-import com.keyvalueserver.project.model.KeyValuePOJO;
-import com.keyvalueserver.project.model.KeyValuePair;
+import com.keyvalueserver.project.keyvalue.KeyValuePOJO;
+import com.keyvalueserver.project.keyvalue.KeyValuePair;
 
 @RestController
 @Slf4j

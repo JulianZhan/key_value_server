@@ -1,10 +1,7 @@
-package com.keyvalueserver.project.service;
+package com.keyvalueserver.project.backup_support;
 
-import com.keyvalueserver.project.model.BackupOperation;
-import com.keyvalueserver.project.model.BackupQueueEntry;
-import com.keyvalueserver.project.model.KeyValuePair;
-import com.keyvalueserver.project.model.OperationType;
-import com.keyvalueserver.project.repository.KeyValueRepository;
+import com.keyvalueserver.project.keyvalue.KeyValuePair;
+import com.keyvalueserver.project.keyvalue.KeyValueRepository;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;

@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.config;
+package com.keyvalueserver.project.security;
 
 import java.util.Date;
 import java.util.HashMap;

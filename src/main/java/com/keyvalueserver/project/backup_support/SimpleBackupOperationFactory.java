@@ -1,5 +1,6 @@
-package com.keyvalueserver.project.model;
+package com.keyvalueserver.project.backup_support;
 
+import com.keyvalueserver.project.keyvalue.KeyValuePair;
 import org.springframework.stereotype.Component;
 
 @Component

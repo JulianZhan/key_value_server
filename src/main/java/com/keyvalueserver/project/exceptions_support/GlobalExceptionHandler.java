@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.exceptions;
+package com.keyvalueserver.project.exceptions_support;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.io.IOException;
-import com.keyvalueserver.project.model.KeyValueApiResponse;
+import com.keyvalueserver.project.keyvalue.KeyValueApiResponse;
 import javax.servlet.http.HttpServletRequest;
 import com.google.gson.JsonSyntaxException;
 

@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.config;
+package com.keyvalueserver.project.security;
 
 import java.io.IOException;
 
@@ -15,7 +15,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.keyvalueserver.project.service.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {

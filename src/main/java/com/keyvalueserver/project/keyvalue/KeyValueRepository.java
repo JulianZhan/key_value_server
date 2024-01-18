@@ -1,7 +1,6 @@
-package com.keyvalueserver.project.repository;
+package com.keyvalueserver.project.keyvalue;
 
 import com.keyvalueserver.project.mapper.KeyValueMapper;
-import com.keyvalueserver.project.model.KeyValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.config;
+package com.keyvalueserver.project.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

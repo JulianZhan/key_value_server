@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.controller;
+package com.keyvalueserver.project.security;
 import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-
-import com.keyvalueserver.project.config.JwtTokenUtil;
-import com.keyvalueserver.project.model.JwtRequest;
-import com.keyvalueserver.project.model.JwtResponse;
 
 @RestController
 @CrossOrigin

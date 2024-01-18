@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.model;
+package com.keyvalueserver.project.keyvalue;
 
 
 import lombok.AllArgsConstructor;

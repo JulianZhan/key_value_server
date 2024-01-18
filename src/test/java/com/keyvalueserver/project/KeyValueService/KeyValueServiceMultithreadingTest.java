@@ -1,10 +1,13 @@
 package com.keyvalueserver.project.KeyValueService;
 
-import com.keyvalueserver.project.exceptions.KeyNotFoundException;
-import com.keyvalueserver.project.model.*;
-import com.keyvalueserver.project.repository.KeyValueRepository;
-import com.keyvalueserver.project.service.BackupRetrievalService;
-import com.keyvalueserver.project.service.BackupService;
+import com.keyvalueserver.project.backup_support.BackupOperation;
+import com.keyvalueserver.project.backup_support.BackupOperationFactory;
+import com.keyvalueserver.project.backup_support.OperationType;
+import com.keyvalueserver.project.exceptions_support.KeyNotFoundException;
+import com.keyvalueserver.project.keyvalue.KeyValuePOJO;
+import com.keyvalueserver.project.keyvalue.KeyValuePair;
+import com.keyvalueserver.project.backup_support.BackupRetrievalService;
+import com.keyvalueserver.project.backup_support.BackupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -17,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import com.keyvalueserver.project.service.KeyValueService;
+import com.keyvalueserver.project.keyvalue.KeyValueService;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 

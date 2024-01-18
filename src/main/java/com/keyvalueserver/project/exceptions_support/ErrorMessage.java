@@ -1,4 +1,4 @@
-package com.keyvalueserver.project.exceptions;
+package com.keyvalueserver.project.exceptions_support;
 
 public class ErrorMessage {
     public static final String KEY_OR_VALUE_CANNOT_BE_NULL = "key or value cannot be null";

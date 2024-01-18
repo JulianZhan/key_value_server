@@ -1,6 +1,6 @@
 package com.keyvalueserver.project.mapper;
 
-import com.keyvalueserver.project.model.KeyValuePair;
+import com.keyvalueserver.project.keyvalue.KeyValuePair;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

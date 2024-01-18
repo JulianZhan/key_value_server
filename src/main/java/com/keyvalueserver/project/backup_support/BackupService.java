@@ -1,6 +1,6 @@
-package com.keyvalueserver.project.service;
+package com.keyvalueserver.project.backup_support;
 
-import com.keyvalueserver.project.repository.KeyValueRepository;
+import com.keyvalueserver.project.keyvalue.KeyValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
