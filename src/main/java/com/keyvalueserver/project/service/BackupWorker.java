@@ -1,19 +1,21 @@
 package com.keyvalueserver.project.service;
 
 import com.keyvalueserver.project.model.BackupOperation;
+import com.keyvalueserver.project.model.BackupQueueEntry;
 import com.keyvalueserver.project.model.KeyValuePair;
 import com.keyvalueserver.project.model.OperationType;
 import com.keyvalueserver.project.repository.KeyValueRepository;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class BackupWorker implements Runnable {
-    protected final BlockingQueue<BackupOperation> backupQueue = new LinkedBlockingQueue<>();
-    protected final DataOperationService dataOperationService;
+    protected final BlockingQueue<BackupQueueEntry> backupQueue = new LinkedBlockingQueue<>();
+    protected final KeyValueRepository keyValueRepository;
 
-    public BackupWorker(DataOperationService dataOperationService) {
-        this.dataOperationService = dataOperationService;
+    public BackupWorker(KeyValueRepository keyValueRepository) {
+        this.keyValueRepository = keyValueRepository;
     }
 
     @Override
@@ -27,8 +29,8 @@ public class BackupWorker implements Runnable {
                 once there is an element in the queue, thread will be notified
                 and it will be in RUNNABLE state
                  */
-                BackupOperation operation = backupQueue.take();
-                processOperation(operation);
+                BackupQueueEntry entry = backupQueue.take();
+                processEntryQueue(entry);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
@@ -36,20 +38,26 @@ public class BackupWorker implements Runnable {
         }
     }
 
-    protected void processOperation(BackupOperation operation) {
+    protected void processEntryQueue(BackupQueueEntry entry) {
+        BackupOperation operation = entry.getBackupOperation();
+        CompletableFuture<Void> completableFuture = entry.getCompletableFuture();
         OperationType operationType = operation.getOperationType();
         KeyValuePair keyValuePair = operation.getKeyValuePair();
         // if the operation is insert, insert or update the key-value pair
         if (operationType.equals(OperationType.INSERT)) {
-            dataOperationService.insertOrUpdateKeyValue(keyValuePair);
+            keyValueRepository.insertOrUpdateKeyValue(keyValuePair);
         } else if (operationType.equals(OperationType.DELETE)) {
             // if the operation is delete, delete the key-value pair
             String key = keyValuePair.getKey();
-            dataOperationService.deleteKeyValue(key);
+            keyValueRepository.deleteKeyValue(key);
         }
+        completableFuture.complete(null);
     }
 
-    public void addToBackupQueue(BackupOperation operation) {
-        backupQueue.add(operation);
+    public CompletableFuture<Void> addToBackupQueue(BackupOperation operation) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        BackupQueueEntry entry = new BackupQueueEntry(operation, future);
+        backupQueue.add(entry);
+        return future;
     }
 }

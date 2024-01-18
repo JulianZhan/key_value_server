@@ -26,18 +26,12 @@ public class KeyValueService {
 
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
     private final BackupService backupService;
-    private final DataOperationService dataOperationService;
-    private final BackupOperationFactory insertOperationFactory;
-    private final BackupOperationFactory deleteOperationFactory;
+    private final BackupOperationFactory backupOperationFactory;
 
     @Autowired
-    public KeyValueService(BackupService backupService, DataOperationService dataOperationService,
-                           @Qualifier("insertBackupOperationFactory") BackupOperationFactory insertOperationFactory,
-                            @Qualifier("deleteBackupOperationFactory") BackupOperationFactory deleteOperationFactory) {
+    public KeyValueService(BackupService backupService, BackupOperationFactory backupOperationFactory) {
         this.backupService = backupService;
-        this.dataOperationService = dataOperationService;
-        this.insertOperationFactory = insertOperationFactory;
-        this.deleteOperationFactory = deleteOperationFactory;
+        this.backupOperationFactory = backupOperationFactory;
     }
 
 
@@ -54,7 +48,7 @@ public class KeyValueService {
             // add backup operation to the queue and end the request to send ack to client
             // TODO: send ack after db backup
             // TODO: be careful with chaining
-            BackupOperation operation = insertOperationFactory.createBackupOperation(keyValuePair);
+            BackupOperation operation = backupOperationFactory.createBackupOperation(keyValuePair, OperationType.INSERT);
             backupService.addToBackupQueue(operation);
         }
     }
@@ -76,17 +70,17 @@ public class KeyValueService {
 
     private String getValueForKey(String key) throws KeyNotFoundException {
         String value = keyValueStore.get(key);
-        if (value != null) {
+//        if (value != null) {
             return value;
-        }
+//        }
         // TODO: unify interface for backup operations
-        value = dataOperationService.getKeyValue(key);
-        if (value == null) {
-            throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
-        }
-        // if data is found in database, put it into keyValueStore as cache
-        keyValueStore.put(key, value);
-        return value;
+//        value = dataOperationService.getKeyValue(key);
+//        if (value == null) {
+//            throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
+//        }
+//        // if data is found in database, put it into keyValueStore as cache
+//        keyValueStore.put(key, value);
+//        return value;
     }
 
     public void deleteKeyValue(String[] keys) throws IllegalArgumentException {
@@ -96,7 +90,7 @@ public class KeyValueService {
             }
             keyValueStore.remove(key);
             KeyValuePair keyValuePair = new KeyValuePair(key, null);
-            BackupOperation operation = deleteOperationFactory.createBackupOperation(keyValuePair);
+            BackupOperation operation = backupOperationFactory.createBackupOperation(keyValuePair, OperationType.DELETE);
             backupService.addToBackupQueue(operation);
         }
     }
