@@ -1,6 +1,8 @@
 package com.keyvalueserver.project.service;
 
 import java.io.PrintWriter;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.keyvalueserver.project.model.*;
@@ -27,11 +29,14 @@ public class KeyValueService {
     private final ConcurrentHashMap<String, String> keyValueStore = new ConcurrentHashMap<>();
     private final BackupService backupService;
     private final BackupOperationFactory backupOperationFactory;
+    private final BackupRetrievalService backupRetrievalService;
 
     @Autowired
-    public KeyValueService(BackupService backupService, BackupOperationFactory backupOperationFactory) {
+    public KeyValueService(BackupService backupService, BackupOperationFactory backupOperationFactory,
+                           BackupRetrievalService backupRetrievalService) {
         this.backupService = backupService;
         this.backupOperationFactory = backupOperationFactory;
+        this.backupRetrievalService = backupRetrievalService;
     }
 
 
@@ -49,7 +54,8 @@ public class KeyValueService {
             // TODO: send ack after db backup
             // TODO: be careful with chaining
             BackupOperation operation = backupOperationFactory.createBackupOperation(keyValuePair, OperationType.INSERT);
-            backupService.addToBackupQueue(operation);
+            CompletableFuture<Void> completableFuture = backupService.addToBackupQueue(operation);
+            completableFuture.join();
         }
     }
 
@@ -69,18 +75,21 @@ public class KeyValueService {
     }
 
     private String getValueForKey(String key) throws KeyNotFoundException {
-        String value = keyValueStore.get(key);
-//        if (value != null) {
-            return value;
-//        }
         // TODO: unify interface for backup operations
-//        value = dataOperationService.getKeyValue(key);
-//        if (value == null) {
-//            throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
-//        }
-//        // if data is found in database, put it into keyValueStore as cache
-//        keyValueStore.put(key, value);
-//        return value;
+        Optional<String> optionalValue = Optional.ofNullable(keyValueStore.get(key));
+        if (optionalValue.isPresent()) {
+            return optionalValue.get();
+        }
+        else {
+            optionalValue = backupRetrievalService.getKeyValue(key);
+            if (optionalValue.isPresent()) {
+                String value = optionalValue.get();
+                keyValueStore.put(key, value);
+                return value;
+            } else {
+                throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
+            }
+        }
     }
 
     public void deleteKeyValue(String[] keys) throws IllegalArgumentException {
@@ -91,7 +100,8 @@ public class KeyValueService {
             keyValueStore.remove(key);
             KeyValuePair keyValuePair = new KeyValuePair(key, null);
             BackupOperation operation = backupOperationFactory.createBackupOperation(keyValuePair, OperationType.DELETE);
-            backupService.addToBackupQueue(operation);
+            CompletableFuture<Void> completableFuture = backupService.addToBackupQueue(operation);
+            completableFuture.join();
         }
     }
 

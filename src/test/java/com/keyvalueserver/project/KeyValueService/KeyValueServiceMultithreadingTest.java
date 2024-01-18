@@ -1,18 +1,23 @@
 package com.keyvalueserver.project.KeyValueService;
 
 import com.keyvalueserver.project.exceptions.KeyNotFoundException;
-import com.keyvalueserver.project.model.KeyValuePair;
+import com.keyvalueserver.project.model.*;
 import com.keyvalueserver.project.repository.KeyValueRepository;
+import com.keyvalueserver.project.service.BackupRetrievalService;
 import com.keyvalueserver.project.service.BackupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import com.keyvalueserver.project.service.KeyValueService;
-import com.keyvalueserver.project.model.KeyValuePOJO;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -21,16 +26,27 @@ class KeyValueServiceMultithreadingTest {
     private KeyValueService keyValueService;
     @Mock
     private BackupService backupService;
-
     @Mock
-    private KeyValueRepository keyValueRepository;
+    private BackupOperationFactory SimpleBackupOperationFactory;
+    @Mock
+    private BackupRetrievalService backupRetrievalService;
     private int numThreads;
     private int numIterations;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        keyValueService = new KeyValueService(backupService, keyValueRepository);
+        BackupOperation mockBackupOperation = new BackupOperation(new KeyValuePair("test", "test"));
+        mockBackupOperation.setOperationType(OperationType.INSERT);
+
+        when(SimpleBackupOperationFactory.createBackupOperation(any(KeyValuePair.class), any(OperationType.class)))
+                .thenReturn(mockBackupOperation);
+        CompletableFuture<Void> completedFuture = CompletableFuture.completedFuture(null);
+        when(backupService.addToBackupQueue(eq(mockBackupOperation))).thenReturn(completedFuture);
+
+        keyValueService = new KeyValueService(backupService, SimpleBackupOperationFactory, backupRetrievalService);
+
+
         numThreads = 100;
         numIterations = 100000;
     }

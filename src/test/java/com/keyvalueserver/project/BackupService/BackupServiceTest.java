@@ -1,7 +1,6 @@
 package com.keyvalueserver.project.BackupService;
 
-import com.keyvalueserver.project.model.BackupOperation;
-import com.keyvalueserver.project.model.KeyValuePair;
+import com.keyvalueserver.project.model.*;
 import com.keyvalueserver.project.repository.KeyValueRepository;
 import com.keyvalueserver.project.service.BackupService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,17 +18,19 @@ class BackupServiceTest {
     private KeyValueRepository keyValueRepository;
 
     private BackupService backupService;
+    private BackupOperationFactory backupOperationFactory;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         backupService = new BackupService(keyValueRepository);
+        backupOperationFactory = new SimpleBackupOperationFactory();
     }
 
     @Test
     void addToBackupQueueInsertOperation() throws InterruptedException {
         KeyValuePair pair = new KeyValuePair("key", "value");
-        BackupOperation operation = new BackupOperation(true, pair);
+        BackupOperation operation = backupOperationFactory.createBackupOperation(pair, OperationType.INSERT);
         backupService.addToBackupQueue(operation);
         verify(keyValueRepository, timeout(50)).insertOrUpdateKeyValue(pair);
     }
@@ -37,8 +38,7 @@ class BackupServiceTest {
     @Test
     void addToBackupQueueDeleteOperation() throws InterruptedException {
         KeyValuePair pair = new KeyValuePair("key", null);
-        BackupOperation operation = new BackupOperation(false, pair);
-
+        BackupOperation operation = backupOperationFactory.createBackupOperation(pair, OperationType.DELETE);
         backupService.addToBackupQueue(operation);
         verify(keyValueRepository, timeout(50)).deleteKeyValue("key");
     }

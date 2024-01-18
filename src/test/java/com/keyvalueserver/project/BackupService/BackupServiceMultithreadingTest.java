@@ -1,7 +1,6 @@
 package com.keyvalueserver.project.BackupService;
 
-import com.keyvalueserver.project.model.BackupOperation;
-import com.keyvalueserver.project.model.KeyValuePair;
+import com.keyvalueserver.project.model.*;
 import com.keyvalueserver.project.repository.KeyValueRepository;
 import com.keyvalueserver.project.service.BackupService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +20,7 @@ class BackupServiceMultithreadingTest {
     @Mock
     private KeyValueRepository keyValueRepository;
     private BackupService backupService;
+    private BackupOperationFactory backupOperationFactory;
     private int numThreads;
     private int numIterations;
 
@@ -28,6 +28,7 @@ class BackupServiceMultithreadingTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         backupService = new BackupService(keyValueRepository);
+        backupOperationFactory = new SimpleBackupOperationFactory();
         numThreads = 100;
         numIterations = 100000;
     }
@@ -40,10 +41,9 @@ class BackupServiceMultithreadingTest {
             executor.submit(() -> {
                 KeyValuePair pair = new KeyValuePair("key", "value");
                 // add insert and delete operations for both numIterations times to the backup queue
-                // TODO: Builder
-                BackupOperation operation = new BackupOperation(true, pair);
+                BackupOperation operation = backupOperationFactory.createBackupOperation(pair, OperationType.INSERT);
                 backupService.addToBackupQueue(operation);
-                operation = new BackupOperation(false, pair);
+                operation = backupOperationFactory.createBackupOperation(pair, OperationType.DELETE);
 //                operation.delete
                 backupService.addToBackupQueue(operation);
             });
