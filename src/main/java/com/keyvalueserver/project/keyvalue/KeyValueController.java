@@ -51,8 +51,9 @@ public class KeyValueController {
             }
     )
     @GetMapping("/{key}")
-    public ResponseEntity<KeyValueApiResponse> getKeyValue(@PathVariable("key") String[] keys) {
-        String[] value = keyValueService.getKeyValue(keys);
+    public ResponseEntity<KeyValueApiResponse> getKeyValue(@PathVariable("key") String[] keys,
+    @RequestParam(name = "fromBackup", defaultValue = "false") Boolean fromBackup) {
+        String[] value = keyValueService.getKeyValue(keys, fromBackup);
         return ResponseEntity.status(HttpStatus.OK).body(new KeyValueApiResponse(true, "Key retrieved successfully", value));
     }
 

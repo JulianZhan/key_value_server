@@ -1,23 +1,20 @@
 package com.keyvalueserver.project.keyvalue;
 
-import java.io.PrintWriter;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.keyvalueserver.project.backup_support.*;
+import com.keyvalueserver.project.exceptions_support.ErrorMessage;
+import com.keyvalueserver.project.exceptions_support.KeyNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
-import com.keyvalueserver.project.exceptions_support.KeyNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
-import com.keyvalueserver.project.exceptions_support.ErrorMessage;
-
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVFormat;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Slf4j
@@ -57,7 +54,7 @@ public class KeyValueService {
         }
     }
 
-    public String[] getKeyValue(String[] keys) throws KeyNotFoundException, IllegalArgumentException {
+    public String[] getKeyValue(String[] keys, Boolean fromBackup) throws KeyNotFoundException, IllegalArgumentException {
         String[] values = new String[keys.length];
         // use for loop to iterate through keys array and get values from keyValueStore
         for (int i = 0; i < keys.length; i++) {
@@ -67,7 +64,7 @@ public class KeyValueService {
                 throw new IllegalArgumentException(ErrorMessage.KEY_OR_VALUE_CANNOT_BE_NULL);
             }
             String key = keys[i];
-            values[i] = getValueForKey(key);
+            values[i] = fromBackup ? getValueForKeyFromBackup(key) : getValueForKey(key);
         }
         return values;
     }
@@ -77,16 +74,17 @@ public class KeyValueService {
         Optional<String> optionalValue = Optional.ofNullable(keyValueStore.get(key));
         if (optionalValue.isPresent()) {
             return optionalValue.get();
+        } else {
+            return getValueForKeyFromBackup(key);
         }
-        else {
-            optionalValue = backupRetrievalService.getKeyValue(key);
-            if (optionalValue.isPresent()) {
-                String value = optionalValue.get();
-                keyValueStore.put(key, value);
-                return value;
-            } else {
-                throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
-            }
+    }
+
+    private String getValueForKeyFromBackup(String key) throws KeyNotFoundException {
+        Optional<String> optionalValue = backupRetrievalService.getKeyValue(key);
+        if (optionalValue.isPresent()) {
+            return optionalValue.get();
+        } else {
+            throw new KeyNotFoundException(String.format(ErrorMessage.KEY_NOT_FOUND, key));
         }
     }
 
@@ -105,12 +103,11 @@ public class KeyValueService {
     public void exportCSVFile(PrintWriter writer) throws IOException {
         // Reference: https://springhow.com/spring-boot-export-to-csv/
         // receive PrintWriter from HttpServletResponse in KeyValueController
-        try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT))
-            {   // print header
-                csvPrinter.printRecord("Key", "Value");
-                // use for loop to print each key-value pair
-                for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
-                    csvPrinter.printRecord(entry.getKey(), entry.getValue());
+        try (CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {   // print header
+            csvPrinter.printRecord("Key", "Value");
+            // use for loop to print each key-value pair
+            for (Map.Entry<String, String> entry : keyValueStore.entrySet()) {
+                csvPrinter.printRecord(entry.getKey(), entry.getValue());
             }
         }
     }
