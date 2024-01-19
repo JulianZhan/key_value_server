@@ -1,28 +1,23 @@
 package com.keyvalueserver.project.KeyValueService;
 
-import com.keyvalueserver.project.backup_support.BackupOperation;
-import com.keyvalueserver.project.backup_support.BackupOperationFactory;
-import com.keyvalueserver.project.backup_support.OperationType;
+import com.keyvalueserver.project.backup_support.*;
 import com.keyvalueserver.project.exceptions_support.KeyNotFoundException;
 import com.keyvalueserver.project.keyvalue.KeyValuePOJO;
 import com.keyvalueserver.project.keyvalue.KeyValuePair;
-import com.keyvalueserver.project.backup_support.BackupRetrievalService;
-import com.keyvalueserver.project.backup_support.BackupService;
+import com.keyvalueserver.project.keyvalue.KeyValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-
-import com.keyvalueserver.project.keyvalue.KeyValueService;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 
 class KeyValueServiceMultithreadingTest {
@@ -74,7 +69,9 @@ class KeyValueServiceMultithreadingTest {
             int finalI = i;
             executor.submit(() -> {
                 try {
-                    String[] values = keyValueService.getKeyValue(keys);
+                    String[] values = keyValueService.getKeyValue(keys, false);
+                    assertEquals("value" + finalI, values[0]);
+                    values = keyValueService.getKeyValue(keys, true);
                     assertEquals("value" + finalI, values[0]);
                 } catch (KeyNotFoundException e) {
                     fail("Key not found: " + e.getMessage());
@@ -96,7 +93,8 @@ class KeyValueServiceMultithreadingTest {
         for (int i = 0; i < numIterations; i++) {
             String[] keys = {"key" + i};
             // after deleting the key-value pair, all the keys should not be found
-            assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys));
+            assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys, false));
+            assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys, true));
         }
     }
 }

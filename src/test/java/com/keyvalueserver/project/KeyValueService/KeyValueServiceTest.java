@@ -1,28 +1,20 @@
 package com.keyvalueserver.project.KeyValueService;
 
-import com.keyvalueserver.project.backup_support.BackupOperation;
-import com.keyvalueserver.project.backup_support.BackupOperationFactory;
-import com.keyvalueserver.project.backup_support.OperationType;
-import com.keyvalueserver.project.backup_support.BackupRetrievalService;
-import com.keyvalueserver.project.backup_support.BackupService;
+import com.keyvalueserver.project.backup_support.*;
+import com.keyvalueserver.project.exceptions_support.KeyNotFoundException;
+import com.keyvalueserver.project.keyvalue.KeyValuePair;
 import com.keyvalueserver.project.keyvalue.KeyValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import com.keyvalueserver.project.keyvalue.KeyValuePair;
-import com.keyvalueserver.project.exceptions_support.KeyNotFoundException;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
 public class KeyValueServiceTest {
@@ -56,7 +48,7 @@ public class KeyValueServiceTest {
         keyValueService.setKeyValue(keyValuePairs);
 
         String[] keys = {"key1", "key2"};
-        String[] values = keyValueService.getKeyValue(keys);
+        String[] values = keyValueService.getKeyValue(keys, false);
 
         assertArrayEquals(new String[]{"value1", "value2"}, values);
     }
@@ -66,7 +58,18 @@ public class KeyValueServiceTest {
         String[] keys = {"nonExistingKey"};
         KeyNotFoundException exception = assertThrows(
                 KeyNotFoundException.class,
-                () -> keyValueService.getKeyValue(keys)
+                () -> keyValueService.getKeyValue(keys, false)
+        );
+
+        assertEquals("Key nonExistingKey not found", exception.getMessage());
+    }
+
+    @Test
+    void testKeyNotFoundFromBackup() {
+        String[] keys = {"nonExistingKey"};
+        KeyNotFoundException exception = assertThrows(
+                KeyNotFoundException.class,
+                () -> keyValueService.getKeyValue(keys, true)
         );
 
         assertEquals("Key nonExistingKey not found", exception.getMessage());
@@ -89,7 +92,13 @@ public class KeyValueServiceTest {
     @Test
     void testNullKeyInGet() {
         String[] keys = {null};
-        assertThrows(IllegalArgumentException.class, () -> keyValueService.getKeyValue(keys));
+        assertThrows(IllegalArgumentException.class, () -> keyValueService.getKeyValue(keys, false));
+    }
+
+    @Test
+    void testNullKeyInGetFromBackup() {
+        String[] keys = {null};
+        assertThrows(IllegalArgumentException.class, () -> keyValueService.getKeyValue(keys, true));
     }
 
     @Test
@@ -105,7 +114,8 @@ public class KeyValueServiceTest {
 
         // Trying to retrieve deleted key
         String[] keys = {"key1"};
-        assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys));
+        assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys, false));
+        assertThrows(KeyNotFoundException.class, () -> keyValueService.getKeyValue(keys, true));
     }
 
     @Test
