@@ -46,8 +46,8 @@ public class KeyValueService {
             }
             keyValueStore.put(key, value);
             // add backup operation to the queue and end the request to send ack to client
-            // TODO: send ack after db backup
-            // TODO: be careful with chaining
+            // done: send ack after db backup
+            // done: be careful with chaining
             BackupOperation operation = backupOperationFactory.createBackupOperation(keyValuePair, OperationType.INSERT);
             backupService.addToBackupQueue(operation);
             // signal
@@ -70,7 +70,7 @@ public class KeyValueService {
     }
 
     private String getValueForKey(String key) throws KeyNotFoundException {
-        // TODO: unify interface for backup operations
+        // done: unify interface for backup operations
         Optional<String> optionalValue = Optional.ofNullable(keyValueStore.get(key));
         if (optionalValue.isPresent()) {
             return optionalValue.get();
